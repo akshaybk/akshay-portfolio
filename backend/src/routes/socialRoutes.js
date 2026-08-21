@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
   getSocialLinks,
+  getSocialLinkById,
   createSocialLink,
   updateSocialLink,
   deleteSocialLink
@@ -10,6 +11,8 @@ const {
 const router = express.Router();
 
 router.get("/", getSocialLinks);
+router.get("/:id", getSocialLinkById);
+
 router.post("/", createSocialLink);
 router.put("/:id", updateSocialLink);
 router.delete("/:id", deleteSocialLink);

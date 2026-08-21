@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
   getExperience,
+  getExperienceById,
   createExperience,
   updateExperience,
   deleteExperience
@@ -10,6 +11,8 @@ const {
 const router = express.Router();
 
 router.get("/", getExperience);
+router.get("/:id", getExperienceById);
+
 router.post("/", createExperience);
 router.put("/:id", updateExperience);
 router.delete("/:id", deleteExperience);

@@ -1,5 +1,6 @@
 const supabase = require("../config/supabase");
 
+// GET /api/social-links
 const getSocialLinks = async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -7,22 +8,62 @@ const getSocialLinks = async (req, res) => {
       .select("*")
       .order("display_order", { ascending: true });
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch social links",
+        error: error.message
+      });
+    }
 
     res.json({
       success: true,
       data
     });
   } catch (error) {
-    console.error("Get social links error:", error);
-
     res.status(500).json({
       success: false,
-      message: "Failed to fetch social links"
+      message: "Failed to fetch social links",
+      error: error.message
     });
   }
 };
 
+
+// GET /api/social-links/:id
+const getSocialLinkById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data, error } = await supabase
+      .from("social_links")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      return res.status(404).json({
+        success: false,
+        message: "Social link not found",
+        error: error.message
+      });
+    }
+
+    res.json({
+      success: true,
+      data
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch social link",
+      error: error.message
+    });
+  }
+};
+
+
+// POST /api/social-links
 const createSocialLink = async (req, res) => {
   try {
     const {
@@ -41,96 +82,122 @@ const createSocialLink = async (req, res) => {
 
     const { data, error } = await supabase
       .from("social_links")
-      .insert({
-        platform,
-        url,
-        icon,
-        display_order: display_order || 0
-      })
+      .insert([
+        {
+          platform,
+          url,
+          icon,
+          display_order: display_order || 0
+        }
+      ])
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create social link",
+        error: error.message
+      });
+    }
 
     res.status(201).json({
       success: true,
+      message: "Social link created successfully",
       data
     });
   } catch (error) {
-    console.error("Create social link error:", error);
-
     res.status(500).json({
       success: false,
-      message: "Failed to create social link"
+      message: "Failed to create social link",
+      error: error.message
     });
   }
 };
 
+
+// PUT /api/social-links/:id
 const updateSocialLink = async (req, res) => {
   try {
-    const allowedFields = [
-      "platform",
-      "url",
-      "icon",
-      "display_order"
-    ];
+    const { id } = req.params;
 
-    const updates = {};
-
-    for (const field of allowedFields) {
-      if (req.body[field] !== undefined) {
-        updates[field] = req.body[field];
-      }
-    }
+    const {
+      platform,
+      url,
+      icon,
+      display_order
+    } = req.body;
 
     const { data, error } = await supabase
       .from("social_links")
-      .update(updates)
-      .eq("id", req.params.id)
+      .update({
+        platform,
+        url,
+        icon,
+        display_order
+      })
+      .eq("id", id)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update social link",
+        error: error.message
+      });
+    }
 
     res.json({
       success: true,
+      message: "Social link updated successfully",
       data
     });
   } catch (error) {
-    console.error("Update social link error:", error);
-
     res.status(500).json({
       success: false,
-      message: "Failed to update social link"
+      message: "Failed to update social link",
+      error: error.message
     });
   }
 };
 
+
+// DELETE /api/social-links/:id
 const deleteSocialLink = async (req, res) => {
   try {
+    const { id } = req.params;
+
     const { error } = await supabase
       .from("social_links")
       .delete()
-      .eq("id", req.params.id);
+      .eq("id", id);
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to delete social link",
+        error: error.message
+      });
+    }
 
     res.json({
       success: true,
       message: "Social link deleted successfully"
     });
   } catch (error) {
-    console.error("Delete social link error:", error);
-
     res.status(500).json({
       success: false,
-      message: "Failed to delete social link"
+      message: "Failed to delete social link",
+      error: error.message
     });
   }
 };
 
+
 module.exports = {
   getSocialLinks,
+  getSocialLinkById,
   createSocialLink,
   updateSocialLink,
   deleteSocialLink

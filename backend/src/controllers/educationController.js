@@ -1,28 +1,70 @@
 const supabase = require("../config/supabase");
 
+// GET /api/education
 const getEducation = async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("education")
       .select("*")
-      .order("display_order", { ascending: true });
+      .order("display_order", { ascending: true })
+      .order("start_date", { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch education",
+        error: error.message
+      });
+    }
 
     res.json({
       success: true,
       data
     });
   } catch (error) {
-    console.error("Get education error:", error);
-
     res.status(500).json({
       success: false,
-      message: "Failed to fetch education"
+      message: "Failed to fetch education",
+      error: error.message
     });
   }
 };
 
+
+// GET /api/education/:id
+const getEducationById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data, error } = await supabase
+      .from("education")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      return res.status(404).json({
+        success: false,
+        message: "Education record not found",
+        error: error.message
+      });
+    }
+
+    res.json({
+      success: true,
+      data
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch education record",
+      error: error.message
+    });
+  }
+};
+
+
+// POST /api/education
 const createEducation = async (req, res) => {
   try {
     const {
@@ -45,7 +87,63 @@ const createEducation = async (req, res) => {
 
     const { data, error } = await supabase
       .from("education")
-      .insert({
+      .insert([
+        {
+          institution,
+          degree,
+          field,
+          location,
+          start_date,
+          end_date,
+          description,
+          display_order: display_order || 0
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create education record",
+        error: error.message
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Education record created successfully",
+      data
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to create education record",
+      error: error.message
+    });
+  }
+};
+
+
+// PUT /api/education/:id
+const updateEducation = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const {
+      institution,
+      degree,
+      field,
+      location,
+      start_date,
+      end_date,
+      description,
+      display_order
+    } = req.body;
+
+    const { data, error } = await supabase
+      .from("education")
+      .update({
         institution,
         degree,
         field,
@@ -53,96 +151,70 @@ const createEducation = async (req, res) => {
         start_date,
         end_date,
         description,
-        display_order: display_order || 0
+        display_order
       })
+      .eq("id", id)
       .select()
       .single();
 
-    if (error) throw error;
-
-    res.status(201).json({
-      success: true,
-      data
-    });
-  } catch (error) {
-    console.error("Create education error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to create education"
-    });
-  }
-};
-
-const updateEducation = async (req, res) => {
-  try {
-    const allowedFields = [
-      "institution",
-      "degree",
-      "field",
-      "location",
-      "start_date",
-      "end_date",
-      "description",
-      "display_order"
-    ];
-
-    const updates = {};
-
-    for (const field of allowedFields) {
-      if (req.body[field] !== undefined) {
-        updates[field] = req.body[field];
-      }
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update education record",
+        error: error.message
+      });
     }
-
-    const { data, error } = await supabase
-      .from("education")
-      .update(updates)
-      .eq("id", req.params.id)
-      .select()
-      .single();
-
-    if (error) throw error;
 
     res.json({
       success: true,
+      message: "Education record updated successfully",
       data
     });
   } catch (error) {
-    console.error("Update education error:", error);
-
     res.status(500).json({
       success: false,
-      message: "Failed to update education"
+      message: "Failed to update education record",
+      error: error.message
     });
   }
 };
 
+
+// DELETE /api/education/:id
 const deleteEducation = async (req, res) => {
   try {
+    const { id } = req.params;
+
     const { error } = await supabase
       .from("education")
       .delete()
-      .eq("id", req.params.id);
+      .eq("id", id);
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to delete education record",
+        error: error.message
+      });
+    }
 
     res.json({
       success: true,
-      message: "Education deleted successfully"
+      message: "Education record deleted successfully"
     });
   } catch (error) {
-    console.error("Delete education error:", error);
-
     res.status(500).json({
       success: false,
-      message: "Failed to delete education"
+      message: "Failed to delete education record",
+      error: error.message
     });
   }
 };
 
+
 module.exports = {
   getEducation,
+  getEducationById,
   createEducation,
   updateEducation,
   deleteEducation

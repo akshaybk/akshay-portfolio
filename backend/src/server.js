@@ -8,6 +8,7 @@ const skillRoutes = require("./routes/skillRoutes");
 const experienceRoutes = require("./routes/experienceRoutes");
 const educationRoutes = require("./routes/educationRoutes");
 const socialRoutes = require("./routes/socialRoutes");
+const siteSettingsRoutes = require("./routes/siteSettingsRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +29,7 @@ app.use("/api/skills", skillRoutes);
 app.use("/api/experience", experienceRoutes);
 app.use("/api/education", educationRoutes);
 app.use("/api/social-links", socialRoutes);
+app.use("/api/site-settings", siteSettingsRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
