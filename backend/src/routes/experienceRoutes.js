@@ -8,13 +8,15 @@ const {
   deleteExperience
 } = require("../controllers/experienceController");
 
+const requireAuth = require("../middleware/authMiddleware");
+
 const router = express.Router();
 
 router.get("/", getExperience);
 router.get("/:id", getExperienceById);
 
-router.post("/", createExperience);
-router.put("/:id", updateExperience);
-router.delete("/:id", deleteExperience);
+router.post("/",requireAuth, createExperience);
+router.put("/:id",requireAuth, updateExperience);
+router.delete("/:id",requireAuth, deleteExperience);
 
 module.exports = router;

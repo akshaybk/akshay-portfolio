@@ -7,12 +7,14 @@ const {
   deleteSiteSettings
 } = require("../controllers/siteSettingsController");
 
+const requireAuth = require("../middleware/authMiddleware");
+
 const router = express.Router();
 
 router.get("/", getSiteSettings);
 
-router.post("/", createSiteSettings);
-router.put("/:id", updateSiteSettings);
-router.delete("/:id", deleteSiteSettings);
+router.post("/",requireAuth, createSiteSettings);
+router.put("/:id",requireAuth, updateSiteSettings);
+router.delete("/:id",requireAuth, deleteSiteSettings);
 
 module.exports = router;

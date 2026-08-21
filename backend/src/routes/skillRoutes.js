@@ -8,13 +8,15 @@ const {
   deleteSkill
 } = require("../controllers/skillsController");
 
+const requireAuth = require("../middleware/authMiddleware");
+
 const router = express.Router();
 
 router.get("/", getSkills);
 router.get("/:id", getSkillById);
 
-router.post("/", createSkill);
-router.put("/:id", updateSkill);
-router.delete("/:id", deleteSkill);
+router.post("/",requireAuth, createSkill);
+router.put("/:id",requireAuth, updateSkill);
+router.delete("/:id",requireAuth, deleteSkill);
 
 module.exports = router;
