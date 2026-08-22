@@ -1430,3 +1430,10 @@ img {
     font-size: 34px;
   }
 }
+
+.skill-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+}
