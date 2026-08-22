@@ -1,0 +1,134 @@
+function Projects({ projects }) {
+  if (!projects || projects.length === 0) {
+    return null;
+  }
+
+  const sortedProjects = [...projects].sort(
+    (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)
+  );
+
+  const featuredProjects = sortedProjects.filter(
+    (project) => project.featured
+  );
+
+  const otherProjects = sortedProjects.filter(
+    (project) => !project.featured
+  );
+
+  return (
+    <section id="projects" className="section">
+      <div className="section-container">
+        <div className="projects-heading">
+          <p className="section-label">WORK</p>
+          <h2>Selected Projects</h2>
+          <p className="section-intro">
+            A selection of things I've built and worked on.
+          </p>
+        </div>
+
+        {featuredProjects.length > 0 && (
+          <div className="featured-projects">
+            {featuredProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                featured
+              />
+            ))}
+          </div>
+        )}
+
+        {otherProjects.length > 0 && (
+          <div className="projects-grid">
+            {otherProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ProjectCard({ project, featured = false }) {
+  return (
+    <article
+      className={`project-card ${
+        featured ? "project-card-featured" : ""
+      }`}
+    >
+      {project.image_url && (
+        <div className="project-image-wrapper">
+          <img
+            src={project.image_url}
+            alt={project.title}
+            className="project-image"
+          />
+
+          {project.featured && (
+            <span className="featured-badge">
+              Featured
+            </span>
+          )}
+        </div>
+      )}
+
+      <div className="project-content">
+        <div className="project-header">
+          <div>
+            <p className="project-slug">
+              /{project.slug}
+            </p>
+
+            <h3>{project.title}</h3>
+          </div>
+
+          <div className="project-links">
+            {project.github_url && (
+              <a
+                href={project.github_url}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${project.title} GitHub repository`}
+              >
+                GitHub
+              </a>
+            )}
+
+            {project.live_url && (
+              <a
+                href={project.live_url}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${project.title} live demo`}
+              >
+                Live
+              </a>
+            )}
+          </div>
+        </div>
+
+        {project.short_description && (
+          <p className="project-description">
+            {project.short_description}
+          </p>
+        )}
+
+        {project.technologies?.length > 0 && (
+          <div className="technologies">
+            {project.technologies.map((technology) => (
+              <span key={technology}>
+                {technology}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
+export default Projects;
