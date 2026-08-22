@@ -5,9 +5,16 @@ function Projects({ projects }) {
     return null;
   }
 
-  const sortedProjects = [...projects].sort(
-    (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)
-  );
+  const sortedProjects = [...projects].sort((a, b) => {
+    if (a.featured !== b.featured) {
+      return a.featured ? -1 : 1;
+    }
+
+    return (
+      (a.display_order ?? 0) -
+      (b.display_order ?? 0)
+    );
+  });
 
   const featuredProjects = sortedProjects.filter(
     (project) => project.featured
@@ -23,7 +30,9 @@ function Projects({ projects }) {
         <Reveal>
           <div className="projects-heading">
             <p className="section-label">WORK</p>
+
             <h2>Selected Projects</h2>
+
             <p className="section-intro">
               A selection of things I've built and worked on.
             </p>
@@ -64,6 +73,8 @@ function Projects({ projects }) {
 }
 
 function ProjectCard({ project, featured = false }) {
+  const title = project.title || "Untitled Project";
+
   return (
     <article
       className={`project-card ${
@@ -74,8 +85,9 @@ function ProjectCard({ project, featured = false }) {
         <div className="project-image-wrapper">
           <img
             src={project.image_url}
-            alt={project.title}
+            alt={`${title} preview`}
             className="project-image"
+            loading="lazy"
           />
 
           {project.featured && (
@@ -89,36 +101,40 @@ function ProjectCard({ project, featured = false }) {
       <div className="project-content">
         <div className="project-header">
           <div>
-            <p className="project-slug">
-              /{project.slug}
-            </p>
-
-            <h3>{project.title}</h3>
-          </div>
-
-          <div className="project-links">
-            {project.github_url && (
-              <a
-                href={project.github_url}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`${project.title} GitHub repository`}
-              >
-                GitHub
-              </a>
+            {project.slug && (
+              <p className="project-slug">
+                /{project.slug}
+              </p>
             )}
 
-            {project.live_url && (
-              <a
-                href={project.live_url}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`${project.title} live demo`}
-              >
-                Live
-              </a>
-            )}
+            <h3>{title}</h3>
           </div>
+
+          {(project.github_url || project.live_url) && (
+            <div className="project-links">
+              {project.github_url && (
+                <a
+                  href={project.github_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${title} GitHub repository`}
+                >
+                  GitHub
+                </a>
+              )}
+
+              {project.live_url && (
+                <a
+                  href={project.live_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${title} live demo`}
+                >
+                  Live
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
         {project.short_description && (

@@ -23,7 +23,9 @@ function Skills({ skills }) {
         <Reveal>
           <div className="skills-heading">
             <p className="section-label">EXPERTISE</p>
+
             <h2>Skills</h2>
+
             <p className="section-intro">
               Technologies and tools I work with.
             </p>
@@ -32,64 +34,89 @@ function Skills({ skills }) {
 
         <div className="skills-categories">
           {Object.entries(groupedSkills).map(
-            ([category, categorySkills], categoryIndex) => (
-              <Reveal
-                key={category}
-                delay={categoryIndex * 0.08}
-              >
-                <div className="skills-category">
-                  <h3>{category}</h3>
+            ([category, categorySkills], categoryIndex) => {
+              const sortedSkills = [...categorySkills].sort(
+                (a, b) =>
+                  (b.proficiency ?? 0) -
+                  (a.proficiency ?? 0)
+              );
 
-                  <div className="skills-grid">
-                    {categorySkills.map((skill, skillIndex) => (
-                      <Reveal
-                        key={skill.id}
-                        delay={skillIndex * 0.05}
-                      >
-                        <div className="skill-card">
-                          <div className="skill-card-top">
-                            {skill.icon && (
-                              <span className="skill-icon">
-                                {skill.icon}
-                              </span>
-                            )}
+              return (
+                <Reveal
+                  key={category}
+                  delay={categoryIndex * 0.08}
+                >
+                  <div className="skills-category">
+                    <div className="skills-category-header">
+                      <h3>{category}</h3>
 
-                            <h4>{skill.name}</h4>
-                          </div>
+                      <span className="skills-count">
+                        {sortedSkills.length}
+                        {sortedSkills.length === 1
+                          ? " skill"
+                          : " skills"}
+                      </span>
+                    </div>
 
-                          {skill.proficiency !== null &&
-                            skill.proficiency !== undefined && (
-                              <div className="skill-proficiency">
-                                <div className="proficiency-header">
-                                  <span>Proficiency</span>
-                                  <span>
-                                    {skill.proficiency}%
+                    <div className="skills-grid">
+                      {sortedSkills.map((skill, skillIndex) => {
+                        const proficiency =
+                          skill.proficiency !== null &&
+                          skill.proficiency !== undefined
+                            ? Math.min(
+                                Math.max(
+                                  skill.proficiency,
+                                  0
+                                ),
+                                100
+                              )
+                            : null;
+
+                        return (
+                          <Reveal
+                            key={skill.id}
+                            delay={skillIndex * 0.05}
+                          >
+                            <article className="skill-card">
+                              <div className="skill-card-top">
+                                <div className="skill-identity">
+                                  {skill.icon && (
+                                    <span className="skill-icon">
+                                      {skill.icon}
+                                    </span>
+                                  )}
+
+                                  <h4>{skill.name}</h4>
+                                </div>
+
+                                {proficiency !== null && (
+                                  <span className="skill-percentage">
+                                    {proficiency}%
                                   </span>
-                                </div>
-
-                                <div className="proficiency-track">
-                                  <div
-                                    className="proficiency-fill"
-                                    style={{
-                                      width: `${Math.min(
-                                        Math.max(
-                                          skill.proficiency,
-                                          0
-                                        ),
-                                        100
-                                      )}%`
-                                    }}
-                                  />
-                                </div>
+                                )}
                               </div>
-                            )}
-                        </div>
-                      </Reveal>
-                    ))}
+
+                              {proficiency !== null && (
+                                <div className="skill-proficiency">
+                                  <div className="proficiency-track">
+                                    <div
+                                      className="proficiency-fill"
+                                      style={{
+                                        width: `${proficiency}%`
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </article>
+                          </Reveal>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              </Reveal>
-            )
+                </Reveal>
+              );
+            }
           )}
         </div>
       </div>

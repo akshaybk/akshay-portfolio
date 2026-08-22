@@ -2,17 +2,20 @@ import { motion } from "framer-motion";
 
 function Reveal({ children, delay = 0, direction = "up" }) {
   const directions = {
-    up: { y: 30, x: 0 },
-    down: { y: -30, x: 0 },
-    left: { y: 0, x: -30 },
-    right: { y: 0, x: 30 }
+    up: { y: 24, x: 0 },
+    down: { y: -24, x: 0 },
+    left: { y: 0, x: -24 },
+    right: { y: 0, x: 24 }
   };
+
+  const initialPosition =
+    directions[direction] || directions.up;
 
   return (
     <motion.div
       initial={{
         opacity: 0,
-        ...directions[direction]
+        ...initialPosition
       }}
       whileInView={{
         opacity: 1,
@@ -21,12 +24,12 @@ function Reveal({ children, delay = 0, direction = "up" }) {
       }}
       viewport={{
         once: true,
-        amount: 0.2
+        amount: 0.15
       }}
       transition={{
-        duration: 0.6,
+        duration: 0.55,
         delay,
-        ease: "easeOut"
+        ease: [0.22, 1, 0.36, 1]
       }}
     >
       {children}

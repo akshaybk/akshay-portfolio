@@ -5,13 +5,21 @@ function Education({ education }) {
     return null;
   }
 
+  const sortedEducation = [...education].sort(
+    (a, b) =>
+      new Date(b.start_date || 0) -
+      new Date(a.start_date || 0)
+  );
+
   return (
     <section id="education" className="section">
       <div className="section-container">
         <Reveal>
           <div className="education-heading">
             <p className="section-label">EDUCATION</p>
+
             <h2>Education</h2>
+
             <p className="section-intro">
               My academic background and learning journey.
             </p>
@@ -19,8 +27,11 @@ function Education({ education }) {
         </Reveal>
 
         <div className="education-list">
-          {education.map((item, index) => (
-            <Reveal key={item.id} delay={index * 0.08}>
+          {sortedEducation.map((item, index) => (
+            <Reveal
+              key={item.id}
+              delay={index * 0.08}
+            >
               <article className="education-item">
                 <div className="education-period">
                   {item.start_date && (
@@ -29,15 +40,15 @@ function Education({ education }) {
                     </span>
                   )}
 
-                  {item.start_date && item.end_date && (
+                  {item.start_date && (
                     <span>—</span>
                   )}
 
-                  {item.end_date && (
-                    <span>
-                      {formatDate(item.end_date)}
-                    </span>
-                  )}
+                  <span>
+                    {item.end_date
+                      ? formatDate(item.end_date)
+                      : "Present"}
+                  </span>
                 </div>
 
                 <div className="education-content">
@@ -49,9 +60,11 @@ function Education({ education }) {
                     </p>
                   )}
 
-                  <p className="education-institution">
-                    {item.institution}
-                  </p>
+                  {item.institution && (
+                    <p className="education-institution">
+                      {item.institution}
+                    </p>
+                  )}
 
                   {item.location && (
                     <p className="education-location">

@@ -66,7 +66,7 @@ function App() {
           siteSettings
         });
       } catch (err) {
-        console.error(err);
+        console.error("Portfolio loading error:", err);
         setError("Failed to load portfolio.");
       } finally {
         setLoading(false);
@@ -76,23 +76,35 @@ function App() {
     loadPortfolio();
   }, []);
 
+  /*
+   * Apply site settings from Supabase
+   */
   useEffect(() => {
-  const settings = Array.isArray(portfolio.siteSettings)
-    ? portfolio.siteSettings[0]
-    : portfolio.siteSettings;
+    const settings = Array.isArray(portfolio.siteSettings)
+      ? portfolio.siteSettings[0]
+      : portfolio.siteSettings;
 
-  const accentColor = settings?.accent_color;
+    const accentColor = settings?.accent_color;
 
-  console.log("Site settings:", portfolio.siteSettings);
-  console.log("Accent color:", accentColor);
+    if (!accentColor) {
+      return;
+    }
 
-  if (accentColor) {
     document.documentElement.style.setProperty(
       "--accent-color",
       accentColor
     );
-  }
-}, [portfolio.siteSettings]);
+
+    document.documentElement.style.setProperty(
+      "--accent-soft",
+      hexToRgba(accentColor, 0.12)
+    );
+
+    document.documentElement.style.setProperty(
+      "--accent-border",
+      hexToRgba(accentColor, 0.45)
+    );
+  }, [portfolio.siteSettings]);
 
   if (loading) {
     return (
@@ -136,6 +148,27 @@ function App() {
       <Footer siteSettings={portfolio.siteSettings} />
     </>
   );
+}
+
+/*
+ * Convert a HEX color into RGBA.
+ *
+ * Example:
+ * #7c3aed + 0.12
+ * → rgba(124, 58, 237, 0.12)
+ */
+function hexToRgba(hex, alpha) {
+  const cleanHex = hex.replace("#", "");
+
+  if (cleanHex.length !== 6) {
+    return `rgba(124, 58, 237, ${alpha})`;
+  }
+
+  const r = parseInt(cleanHex.substring(0, 2), 16);
+  const g = parseInt(cleanHex.substring(2, 4), 16);
+  const b = parseInt(cleanHex.substring(4, 6), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 export default App;

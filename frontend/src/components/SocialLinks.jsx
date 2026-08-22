@@ -1,4 +1,14 @@
 import Reveal from "./Reveal";
+import {
+  FaGithub,
+  FaLinkedin,
+  FaTwitter,
+  FaInstagram,
+  FaFacebook,
+  FaYoutube,
+  FaDiscord,
+  FaGlobe
+} from "react-icons/fa";
 
 function SocialLinks({ links }) {
   if (!links || links.length === 0) {
@@ -8,6 +18,20 @@ function SocialLinks({ links }) {
   const sortedLinks = [...links].sort(
     (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)
   );
+
+  const getIcon = (platform) => {
+    const name = platform?.toLowerCase();
+
+    if (name === "github") return <FaGithub />;
+    if (name === "linkedin") return <FaLinkedin />;
+    if (name === "twitter" || name === "x") return <FaTwitter />;
+    if (name === "instagram") return <FaInstagram />;
+    if (name === "facebook") return <FaFacebook />;
+    if (name === "youtube") return <FaYoutube />;
+    if (name === "discord") return <FaDiscord />;
+
+    return <FaGlobe />;
+  };
 
   return (
     <section id="contact" className="section contact-section">
@@ -35,11 +59,9 @@ function SocialLinks({ links }) {
                     rel="noreferrer"
                     className="social-link"
                   >
-                    {link.icon && (
-                      <span className="social-icon">
-                        {link.icon}
-                      </span>
-                    )}
+                    <span className="social-icon">
+                      {getIcon(link.platform)}
+                    </span>
 
                     <span>{link.platform}</span>
 
