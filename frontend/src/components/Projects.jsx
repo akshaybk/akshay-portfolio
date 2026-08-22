@@ -1,3 +1,5 @@
+import Reveal from "./Reveal";
+
 function Projects({ projects }) {
   if (!projects || projects.length === 0) {
     return null;
@@ -18,33 +20,41 @@ function Projects({ projects }) {
   return (
     <section id="projects" className="section">
       <div className="section-container">
-        <div className="projects-heading">
-          <p className="section-label">WORK</p>
-          <h2>Selected Projects</h2>
-          <p className="section-intro">
-            A selection of things I've built and worked on.
-          </p>
-        </div>
+        <Reveal>
+          <div className="projects-heading">
+            <p className="section-label">WORK</p>
+            <h2>Selected Projects</h2>
+            <p className="section-intro">
+              A selection of things I've built and worked on.
+            </p>
+          </div>
+        </Reveal>
 
         {featuredProjects.length > 0 && (
           <div className="featured-projects">
-            {featuredProjects.map((project) => (
-              <ProjectCard
+            {featuredProjects.map((project, index) => (
+              <Reveal
                 key={project.id}
-                project={project}
-                featured
-              />
+                delay={index * 0.1}
+              >
+                <ProjectCard
+                  project={project}
+                  featured
+                />
+              </Reveal>
             ))}
           </div>
         )}
 
         {otherProjects.length > 0 && (
           <div className="projects-grid">
-            {otherProjects.map((project) => (
-              <ProjectCard
+            {otherProjects.map((project, index) => (
+              <Reveal
                 key={project.id}
-                project={project}
-              />
+                delay={index * 0.08}
+              >
+                <ProjectCard project={project} />
+              </Reveal>
             ))}
           </div>
         )}

@@ -1,3 +1,8 @@
+:root {
+  --accent-color: #7c3aed;
+  --accent-soft: rgba(124, 58, 237, 0.12);
+  --accent-border: rgba(124, 58, 237, 0.45);
+}
 
 .navbar {
   position: sticky;
@@ -27,6 +32,65 @@
   opacity: 0.6;
 }
 
+.navbar-links a {
+  position: relative;
+  color: #777;
+  transition: color 0.2s ease;
+}
+
+.navbar-links a:hover {
+  color: #fff;
+  opacity: 1;
+}
+
+.navbar-links a.active {
+  color: var(--accent-color);
+}
+
+.navbar-links a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 1px;
+  background: var(--accent-color);
+}
+
+.navbar-menu-button {
+  display: none;
+  width: 38px;
+  height: 38px;
+  padding: 9px;
+  border: 1px solid #292929;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.navbar-menu-button span {
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin: 4px 0;
+  background: #aaa;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.navbar-menu-button.open span:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+
+.navbar-menu-button.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-menu-button.open span:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
 .hero-section {
   min-height: 85vh;
   display: flex;
@@ -42,7 +106,7 @@
 .section-label {
   font-size: 12px;
   letter-spacing: 0.18em;
-  color: #888;
+  color: var(--accent-color);
 }
 
 .hero-content h1 {
@@ -78,7 +142,8 @@
 }
 
 .hero-actions a:hover {
-  background: #fff;
+  background: var(--accent-color);
+  border-color: var(--accent-color);
   color: #000;
 }
 
@@ -179,6 +244,8 @@
 
 .project-links a:hover,
 .social-links a:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
   color: #fff;
 }
 
@@ -199,7 +266,50 @@
 }
 
 @media (max-width: 700px) {
+  .navbar {
+    position: sticky;
+  }
+
+  .navbar-menu-button {
+    display: block;
+  }
+
   .navbar-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    padding: 10px 7% 18px;
+
+    background: rgba(10, 10, 10, 0.97);
+    border-bottom: 1px solid #222;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease,
+      visibility 0.2s ease;
+  }
+
+  .navbar-links.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .navbar-links a {
+    padding: 13px 0;
+  }
+
+  .navbar-links a.active::after {
     display: none;
   }
 
@@ -325,7 +435,7 @@
 }
 
 .skill-card:hover {
-  border-color: #444;
+  border-color: var(--accent-border);
   transform: translateY(-2px);
 }
 
@@ -347,8 +457,8 @@
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  background: #1a1a1a;
-  color: #aaa;
+  background: var(--accent-soft);
+  color: var(--accent-color);
   font-size: 15px;
 }
 
@@ -374,7 +484,7 @@
 .proficiency-fill {
   height: 100%;
   border-radius: inherit;
-  background: #aaa;
+  background: var(--accent-color);
   transition: width 0.5s ease;
 }
 
@@ -416,7 +526,7 @@
   width: 11px;
   height: 11px;
   margin-top: 8px;
-  border: 2px solid #aaa;
+  border: 2px solid var(--accent-color);
   border-radius: 50%;
   background: #0a0a0a;
 }
@@ -612,7 +722,7 @@
 
 .project-card:hover {
   transform: translateY(-4px);
-  border-color: #444;
+  border-color: var(--accent-border);
 }
 
 .project-card-featured {
@@ -644,10 +754,10 @@
   top: 18px;
   left: 18px;
   padding: 6px 10px;
-  border: 1px solid #444;
+  border: 1px solid var(--accent-border);
   border-radius: 6px;
-  background: rgba(10, 10, 10, 0.85);
-  color: #ddd;
+  background: var(--accent-soft);
+  color: var(--accent-color);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -785,8 +895,8 @@
 }
 
 .social-link:hover {
-  border-color: #444;
-  background: #111;
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
   color: #fff;
 }
 
@@ -809,7 +919,7 @@
 
 .social-link:hover .social-arrow {
   transform: translate(2px, -2px);
-  color: #aaa;
+  color: var(--accent-color);
 }
 
 @media (max-width: 650px) {

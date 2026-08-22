@@ -76,6 +76,24 @@ function App() {
     loadPortfolio();
   }, []);
 
+  useEffect(() => {
+  const settings = Array.isArray(portfolio.siteSettings)
+    ? portfolio.siteSettings[0]
+    : portfolio.siteSettings;
+
+  const accentColor = settings?.accent_color;
+
+  console.log("Site settings:", portfolio.siteSettings);
+  console.log("Accent color:", accentColor);
+
+  if (accentColor) {
+    document.documentElement.style.setProperty(
+      "--accent-color",
+      accentColor
+    );
+  }
+}, [portfolio.siteSettings]);
+
   if (loading) {
     return (
       <div className="loading-screen">

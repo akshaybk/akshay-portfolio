@@ -1,3 +1,5 @@
+import Reveal from "./Reveal";
+
 function SocialLinks({ links }) {
   if (!links || links.length === 0) {
     return null;
@@ -10,40 +12,46 @@ function SocialLinks({ links }) {
   return (
     <section id="contact" className="section contact-section">
       <div className="section-container">
-        <div className="contact-content">
-          <p className="section-label">CONTACT</p>
+        <Reveal>
+          <div className="contact-content">
+            <p className="section-label">CONTACT</p>
 
-          <h2>Let's Connect</h2>
+            <h2>Let's Connect</h2>
 
-          <p className="contact-description">
-            Interested in working together, discussing a project,
-            or simply saying hello? Feel free to reach out.
-          </p>
+            <p className="contact-description">
+              Interested in working together, discussing a project,
+              or simply saying hello? Feel free to reach out.
+            </p>
 
-          <div className="social-links">
-            {sortedLinks.map((link) => (
-              <a
-                key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noreferrer"
-                className="social-link"
-              >
-                {link.icon && (
-                  <span className="social-icon">
-                    {link.icon}
-                  </span>
-                )}
+            <div className="social-links">
+              {sortedLinks.map((link, index) => (
+                <Reveal
+                  key={link.id}
+                  delay={index * 0.08}
+                >
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="social-link"
+                  >
+                    {link.icon && (
+                      <span className="social-icon">
+                        {link.icon}
+                      </span>
+                    )}
 
-                <span>{link.platform}</span>
+                    <span>{link.platform}</span>
 
-                <span className="social-arrow">
-                  ↗
-                </span>
-              </a>
-            ))}
+                    <span className="social-arrow">
+                      ↗
+                    </span>
+                  </a>
+                </Reveal>
+              ))}
+            </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

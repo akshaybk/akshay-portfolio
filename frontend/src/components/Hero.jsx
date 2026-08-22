@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 function Hero({ profile, siteSettings }) {
   const data = profile?.[0];
 
@@ -6,19 +8,46 @@ function Hero({ profile, siteSettings }) {
   return (
     <section id="home" className="hero-section">
       <div className="hero-content">
-        <p className="hero-label">
+        <motion.p
+          className="hero-label"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           {data.availability || "Open to opportunities"}
-        </p>
+        </motion.p>
 
-        <h1>{data.name}</h1>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          {data.name}
+        </motion.h1>
 
-        <h2>{data.headline}</h2>
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          {data.headline}
+        </motion.h2>
 
-        <p className="hero-bio">
+        <motion.p
+          className="hero-bio"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
           {data.bio}
-        </p>
+        </motion.p>
 
-        <div className="hero-actions">
+        <motion.div
+          className="hero-actions"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
           {data.github_url && (
             <a
               href={data.github_url}
@@ -38,7 +67,7 @@ function Hero({ profile, siteSettings }) {
               LinkedIn
             </a>
           )}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
