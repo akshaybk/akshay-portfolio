@@ -2,17 +2,18 @@ const API_BASE_URL = "http://localhost:5000/api";
 
 const request = async (endpoint, options = {}) => {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {})
-    },
-    ...options
+    }
   });
 
   const result = await response.json().catch(() => ({}));
 
   if (!response.ok || !result.success) {
-    throw new Error(result.message || `Request failed: ${endpoint}`);
+    const detail = result.error ? `: ${result.error}` : "";
+    throw new Error(result.message ? `${result.message}${detail}` : `Request failed (${response.status})`);
   }
 
   return result.data;
@@ -36,16 +37,23 @@ export const login = async (email, password) => {
   return data;
 };
 
-export const getMe = () =>
-  request("/auth/me", {
-    headers: { Authorization: `Bearer ${localStorage.getItem("portfolio_admin_token")}` }
+export const getMe = () => {
+  const token = localStorage.getItem("portfolio_admin_token");
+  if (!token) throw new Error("Admin session is missing. Please sign in again.");
+  return request("/auth/me", {
+    headers: { Authorization: `Bearer ${token}` }
   });
+};
 
-export const adminRequest = (endpoint, options = {}) =>
-  request(endpoint, {
+export const adminRequest = (endpoint, options = {}) => {
+  const token = localStorage.getItem("portfolio_admin_token");
+  if (!token) throw new Error("Admin session is missing. Please sign in again.");
+
+  return request(endpoint, {
     ...options,
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("portfolio_admin_token")}`,
+      Authorization: `Bearer ${token}`,
       ...(options.headers || {})
     }
   });
+};
