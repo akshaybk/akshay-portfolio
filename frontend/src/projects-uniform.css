@@ -1,30 +1,34 @@
-/* Project showcase: every card in a row must have identical dimensions. */
+/* Project showcase: every card uses a fixed, uniform desktop height. */
 .projects-showcase-grid {
   align-items: stretch;
-  grid-auto-rows: 1fr;
+  grid-auto-rows: 380px;
 }
 
 .projects-showcase-grid > * {
   display: flex;
   min-width: 0;
-  height: 100%;
+  height: 380px;
+  min-height: 0;
 }
 
 .projects-showcase-card {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(260px, 0.95fr);
   width: 100%;
-  height: 100%;
-  min-height: 300px;
+  height: 380px;
+  min-height: 0;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .projects-showcase-copy {
   display: flex;
   min-width: 0;
+  min-height: 0;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 28px;
+  overflow: hidden;
 }
 
 .projects-showcase-copy .project-description {
@@ -34,18 +38,22 @@
 
 .projects-showcase-copy .project-technologies {
   min-height: 32px;
+  max-height: 72px;
+  overflow: hidden;
   align-content: flex-start;
 }
 
 .projects-showcase-links {
   margin-top: auto;
   padding-top: 20px;
+  flex-shrink: 0;
 }
 
 .projects-showcase-media {
   position: relative;
   min-width: 0;
   min-height: 0;
+  height: calc(100% - 36px);
   margin: 18px 18px 18px 0;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -66,7 +74,7 @@
   display: flex;
   width: 100%;
   height: 100%;
-  min-height: 220px;
+  min-height: 0;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -86,8 +94,17 @@
 }
 
 @media (max-width: 900px) {
+  .projects-showcase-grid {
+    grid-auto-rows: 400px;
+  }
+
+  .projects-showcase-grid > * {
+    height: 400px;
+  }
+
   .projects-showcase-card {
     grid-template-columns: minmax(0, 1fr) minmax(220px, 0.85fr);
+    height: 400px;
   }
 }
 
@@ -102,11 +119,13 @@
 
   .projects-showcase-card {
     grid-template-columns: 1fr;
+    height: auto;
     min-height: 0;
   }
 
   .projects-showcase-copy {
     min-height: 290px;
+    overflow: visible;
   }
 
   .projects-showcase-media {
