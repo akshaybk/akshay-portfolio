@@ -24,12 +24,12 @@ function Hero({ profile }) {
             {data.bio}
           </motion.p>
         )}
-        {(data.github_url || data.linkedin_url) && (
-          <motion.div className="hero-actions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}>
-            {data.github_url && <a href={data.github_url} target="_blank" rel="noopener noreferrer">GitHub</a>}
-            {data.linkedin_url && <a href={data.linkedin_url} target="_blank" rel="noopener noreferrer">LinkedIn</a>}
-          </motion.div>
-        )}
+        <motion.div className="hero-actions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}>
+          <a className="hero-primary-action" href="#projects">View my work</a>
+          {data.resume_url && <a className="hero-secondary-action" href={data.resume_url} target="_blank" rel="noopener noreferrer">View résumé</a>}
+          {data.github_url && <a className="hero-secondary-action" href={data.github_url} target="_blank" rel="noopener noreferrer">GitHub</a>}
+          {data.linkedin_url && <a className="hero-secondary-action" href={data.linkedin_url} target="_blank" rel="noopener noreferrer">LinkedIn</a>}
+        </motion.div>
       </div>
     </section>
   );
