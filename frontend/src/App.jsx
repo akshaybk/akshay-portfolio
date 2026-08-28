@@ -22,6 +22,7 @@ import Footer from "./components/Footer";
 import "./App.css";
 import "./portfolio-polish.css";
 import "./projects-showcase.css";
+import "./projects-uniform.css";
 import "./contact-polish.css";
 
 const firstRecord = (value) => (Array.isArray(value) ? value[0] || null : value || null);
