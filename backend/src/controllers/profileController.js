@@ -47,7 +47,11 @@ const updateProfile = async (req, res) => {
 
     let id = req.params.id;
     if (!id) {
-      const { data: profiles, error: lookupError } = await supabase.from("profile").select("id").order("id", { ascending: true }).limit(1);
+      const { data: profiles, error: lookupError } = await supabase
+        .from("profile")
+        .select("id")
+        .order("id", { ascending: true })
+        .limit(1);
       if (lookupError) throw lookupError;
       id = profiles?.[0]?.id;
     }
@@ -56,13 +60,30 @@ const updateProfile = async (req, res) => {
       return res.status(404).json({ success: false, message: "No profile exists to update" });
     }
 
-    const { data, error } = await supabase.from("profile").update(updates).eq("id", id).select();
-    if (error) throw error;
-    if (!data || data.length === 0) {
-      return res.status(404).json({ success: false, message: "Profile was not updated. Verify the profile ID and database permissions." });
+    // Perform the mutation without requesting a RETURNING representation.
+    // This avoids PostgREST response-shape/RLS issues on UPDATE.
+    const { error: updateError } = await supabase
+      .from("profile")
+      .update(updates)
+      .eq("id", id);
+    if (updateError) throw updateError;
+
+    // Fetch the canonical row after the mutation so the response always has
+    // the same shape as the public profile endpoint.
+    const { data, error: fetchError } = await supabase
+      .from("profile")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+    if (fetchError) throw fetchError;
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile could not be found after update. Check the profile ID and Supabase permissions."
+      });
     }
 
-    res.json({ success: true, data: data[0] });
+    res.json({ success: true, data });
   } catch (error) {
     console.error("Update profile error:", error);
     res.status(500).json({ success: false, message: "Failed to update profile", error: error.message });
