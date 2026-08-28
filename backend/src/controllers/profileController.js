@@ -1,6 +1,5 @@
 const supabase = require("../config/supabase");
 
-// GET all profiles
 const getProfiles = async (req, res) => {
   try {
     const { data, error } = await supabase.from("profile").select("*").order("id", { ascending: true });
@@ -12,7 +11,6 @@ const getProfiles = async (req, res) => {
   }
 };
 
-// GET single profile
 const getProfile = async (req, res) => {
   try {
     const { data, error } = await supabase.from("profile").select("*").eq("id", req.params.id).maybeSingle();
@@ -25,12 +23,10 @@ const getProfile = async (req, res) => {
   }
 };
 
-// CREATE profile
 const createProfile = async (req, res) => {
   try {
     const { name, headline, bio, email, phone, location, profile_image_url, resume_url, availability, github_url, linkedin_url, website_url } = req.body;
     if (!name) return res.status(400).json({ success: false, message: "Name is required" });
-
     const { data, error } = await supabase.from("profile").insert({ name, headline, bio, email, phone, location, profile_image_url, resume_url, availability, github_url, linkedin_url, website_url }).select();
     if (error) throw error;
     res.status(201).json({ success: true, data: data?.[0] || null });
@@ -40,7 +36,6 @@ const createProfile = async (req, res) => {
   }
 };
 
-// UPDATE profile
 const updateProfile = async (req, res) => {
   try {
     const allowedFields = ["name", "headline", "bio", "email", "phone", "location", "profile_image_url", "resume_url", "availability", "github_url", "linkedin_url", "website_url"];
@@ -50,10 +45,21 @@ const updateProfile = async (req, res) => {
     }
     updates.updated_at = new Date().toISOString();
 
-    const { data, error } = await supabase.from("profile").update(updates).eq("id", req.params.id).select();
+    let id = req.params.id;
+    if (!id) {
+      const { data: profiles, error: lookupError } = await supabase.from("profile").select("id").order("id", { ascending: true }).limit(1);
+      if (lookupError) throw lookupError;
+      id = profiles?.[0]?.id;
+    }
+
+    if (id === undefined || id === null) {
+      return res.status(404).json({ success: false, message: "No profile exists to update" });
+    }
+
+    const { data, error } = await supabase.from("profile").update(updates).eq("id", id).select();
     if (error) throw error;
     if (!data || data.length === 0) {
-      return res.status(404).json({ success: false, message: "Profile not found or update was blocked by database permissions" });
+      return res.status(404).json({ success: false, message: "Profile was not updated. Verify the profile ID and database permissions." });
     }
 
     res.json({ success: true, data: data[0] });
@@ -63,7 +69,6 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// DELETE profile
 const deleteProfile = async (req, res) => {
   try {
     const { error } = await supabase.from("profile").delete().eq("id", req.params.id);
