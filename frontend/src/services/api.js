@@ -1,13 +1,18 @@
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
 
 const request = async (endpoint, options = {}) => {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    }
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+  } catch {
+    throw new Error(`Unable to reach the API at ${API_BASE_URL}. Make sure the backend is running.`);
+  }
 
   const result = await response.json().catch(() => ({}));
 
@@ -30,11 +35,10 @@ export const getSocialLinks = () => fetchData("/social-links");
 export const getSiteSettings = () => fetchData("/site-settings");
 
 export const login = async (email, password) => {
-  const data = await request("/auth/login", {
+  return request("/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password })
   });
-  return data;
 };
 
 export const getMe = () => {
