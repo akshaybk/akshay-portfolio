@@ -1,61 +1,289 @@
 import { useEffect, useState } from "react";
-import { adminRequest, getEducation, getExperience, getProjects, getProfile, getSiteSettings, getSkills, getSocialLinks } from "../services/api";
+import {
+  adminRequest,
+  getEducation,
+  getExperience,
+  getProjects,
+  getProfile,
+  getSiteSettings,
+  getSkills,
+  getSocialLinks,
+} from "../services/api";
 
-const sections = ["Overview", "Profile", "Projects", "Skills", "Experience", "Education", "Social Links", "Site Settings"];
-const emptyProfile = { name: "", headline: "", bio: "", email: "", phone: "", location: "", profile_image_url: "", resume_url: "", availability: "", github_url: "", linkedin_url: "", website_url: "" };
-const emptyProject = { title: "", slug: "", short_description: "", description: "", image_url: "", github_url: "", live_url: "", technologies: "", featured: false, display_order: 0 };
-const emptySkill = { name: "", category: "", icon: "", proficiency: 0, display_order: 0 };
-const emptyExperience = { company: "", role: "", location: "", start_date: "", end_date: "", current: false, description: "", technologies: "", display_order: 0 };
-const emptyEducation = { institution: "", degree: "", field: "", location: "", start_date: "", end_date: "", description: "", display_order: 0 };
-const emptySocialLink = { platform: "", url: "", icon: "", display_order: 0 };
-const emptySiteSettings = { site_title: "", site_description: "", accent_color: "#7c3aed", github_username: "", linkedin_url: "", contact_email: "" };
+const sections = [
+  "Overview",
+  "Profile",
+  "Projects",
+  "Skills",
+  "Experience",
+  "Education",
+  "Social Links",
+  "Site Settings",
+];
+
+const empty = {
+  projects: { title: "", slug: "", short_description: "", description: "", image_url: "", github_url: "", live_url: "", technologies: "", featured: false, display_order: 0 },
+  skills: { name: "", category: "", icon: "", proficiency: 0, display_order: 0 },
+  experience: { company: "", role: "", location: "", start_date: "", end_date: "", current: false, description: "", technologies: "", display_order: 0 },
+  education: { institution: "", degree: "", field: "", location: "", start_date: "", end_date: "", description: "", display_order: 0 },
+  social: { platform: "", url: "", icon: "", display_order: 0 },
+  settings: { site_title: "", site_description: "", accent_color: "#7c3aed", github_username: "", linkedin_url: "", contact_email: "" },
+  profile: { name: "", headline: "", bio: "", email: "", phone: "", location: "", profile_image_url: "", resume_url: "", availability: "", github_url: "", linkedin_url: "", website_url: "" },
+};
+
+const configs = {
+  Projects: { key: "projects", endpoint: "projects", singular: "project", fields: ["title", "slug", "short_description", "description", "image_url", "github_url", "live_url", "technologies", "featured", "display_order"], columns: ["title", "slug", "featured", "display_order"] },
+  Skills: { key: "skills", endpoint: "skills", singular: "skill", fields: ["name", "category", "icon", "proficiency", "display_order"], columns: ["name", "category", "proficiency", "display_order"] },
+  Experience: { key: "experience", endpoint: "experience", singular: "experience", fields: ["company", "role", "location", "start_date", "end_date", "current", "description", "technologies", "display_order"], columns: ["role", "company", "start_date", "end_date"] },
+  Education: { key: "education", endpoint: "education", singular: "education", fields: ["institution", "degree", "field", "location", "start_date", "end_date", "description", "display_order"], columns: ["degree", "institution", "start_date", "end_date"] },
+  "Social Links": { key: "social", endpoint: "social-links", singular: "social link", fields: ["platform", "url", "icon", "display_order"], columns: ["platform", "url", "icon", "display_order"] },
+};
 
 function AdminDashboard({ onLogout }) {
   const [active, setActive] = useState("Overview");
-  const [counts, setCounts] = useState({});
+  const [data, setData] = useState({ profile: null, projects: [], skills: [], experience: [], education: [], social: [], settings: null });
   const [message, setMessage] = useState("");
-  const [profile, setProfile] = useState(null);
-  const [projects, setProjects] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [experience, setExperience] = useState([]);
-  const [education, setEducation] = useState([]);
-  const [socialLinks, setSocialLinks] = useState([]);
-  const [siteSettings, setSiteSettings] = useState(null);
 
   const loadData = async () => {
     try {
-      const [profileData, projectData, skillData, experienceData, educationData, socialData, settings] = await Promise.all([getProfile(), getProjects(), getSkills(), getExperience(), getEducation(), getSocialLinks(), getSiteSettings()]);
-      setProfile(Array.isArray(profileData) ? profileData[0] || null : profileData || null);
-      setProjects(projectData || []); setSkills(skillData || []); setExperience(experienceData || []); setEducation(educationData || []); setSocialLinks(socialData || []);
-      setSiteSettings(Array.isArray(settings) ? settings[0] || null : settings || null);
-      setCounts({ Profile: profileData ? 1 : 0, Projects: projectData?.length || 0, Skills: skillData?.length || 0, Experience: experienceData?.length || 0, Education: educationData?.length || 0, "Social Links": socialData?.length || 0, "Site Settings": settings ? 1 : 0 });
-    } catch (err) { setMessage(err.message || "Could not load portfolio data. Check that the API is running."); }
+      const [profile, projects, skills, experience, education, social, settings] = await Promise.all([
+        getProfile(),
+        getProjects(),
+        getSkills(),
+        getExperience(),
+        getEducation(),
+        getSocialLinks(),
+        getSiteSettings(),
+      ]);
+      setData({
+        profile: Array.isArray(profile) ? profile[0] || null : profile || null,
+        projects: projects || [],
+        skills: skills || [],
+        experience: experience || [],
+        education: education || [],
+        social: social || [],
+        settings: Array.isArray(settings) ? settings[0] || null : settings || null,
+      });
+    } catch (error) {
+      setMessage(error.message || "Could not load portfolio data.");
+    }
   };
-  useEffect(() => { loadData(); }, []);
-  const logout = () => { localStorage.removeItem("portfolio_admin_token"); onLogout(); };
 
-  return <div className="admin-shell"><aside className="admin-sidebar"><div><div className="admin-brand">AKSHAY<span>.</span></div><p className="admin-sidebar-label">Management</p><nav>{sections.map((section) => <button key={section} className={active === section ? "active" : ""} onClick={() => { setActive(section); setMessage(""); }}>{section}</button>)}</nav></div><button className="admin-logout" onClick={logout}>Sign out</button></aside><main className="admin-main"><header className="admin-header"><div><p className="admin-eyebrow">Admin Dashboard</p><h1>{active}</h1></div><a href="/" className="admin-view-site">View portfolio ↗</a></header>{message && <div className="admin-notice">{message}</div>}{active === "Overview" ? <Overview counts={counts} onSelect={setActive} /> : active === "Profile" ? <ProfileEditor profile={profile} onSaved={(saved) => { setProfile(saved); setCounts((c) => ({ ...c, Profile: 1 })); }} /> : active === "Projects" ? <ProjectsEditor projects={projects} onChanged={loadData} /> : active === "Skills" ? <SkillsEditor skills={skills} onChanged={loadData} /> : active === "Experience" ? <ExperienceEditor experience={experience} onChanged={loadData} /> : active === "Education" ? <EducationEditor education={education} onChanged={loadData} /> : active === "Social Links" ? <SocialLinksEditor socialLinks={socialLinks} onChanged={loadData} /> : <SiteSettingsEditor settings={siteSettings} onSaved={(saved) => { setSiteSettings(saved); setCounts((c) => ({ ...c, "Site Settings": 1 })); }} />}</main></div>;
+  useEffect(() => { loadData(); }, []);
+
+  const logout = () => {
+    localStorage.removeItem("portfolio_admin_token");
+    onLogout();
+  };
+
+  const counts = {
+    Profile: data.profile ? 1 : 0,
+    Projects: data.projects.length,
+    Skills: data.skills.length,
+    Experience: data.experience.length,
+    Education: data.education.length,
+    "Social Links": data.social.length,
+    "Site Settings": data.settings ? 1 : 0,
+  };
+
+  let content;
+  if (active === "Overview") content = <Overview counts={counts} onSelect={setActive} />;
+  else if (active === "Profile") content = <ProfileEditor value={data.profile} onSaved={loadData} />;
+  else if (active === "Site Settings") content = <SiteSettingsEditor value={data.settings} onSaved={loadData} />;
+  else {
+    const config = configs[active];
+    content = <ResourceEditor config={config} items={data[config.key]} onChanged={loadData} />;
+  }
+
+  return (
+    <div className="admin-shell">
+      <aside className="admin-sidebar">
+        <div>
+          <div className="admin-brand">AKSHAY<span>.</span></div>
+          <p className="admin-sidebar-label">Management</p>
+          <nav>
+            {sections.map((section) => (
+              <button key={section} className={active === section ? "active" : ""} onClick={() => { setActive(section); setMessage(""); }}>
+                {section}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <button className="admin-logout" onClick={logout}>Sign out</button>
+      </aside>
+      <main className="admin-main">
+        <header className="admin-header">
+          <div><p className="admin-eyebrow">Admin Dashboard</p><h1>{active}</h1></div>
+          <a href="/" className="admin-view-site">View portfolio ↗</a>
+        </header>
+        {message && <div className="admin-notice">{message}</div>}
+        {content}
+      </main>
+    </div>
+  );
 }
 
-function Overview({ counts, onSelect }) { return <><div className="admin-welcome"><p className="admin-eyebrow">Control center</p><h2>Keep your portfolio current.</h2><p>Manage the content powering your public portfolio from one place.</p></div><div className="admin-stats">{sections.slice(1).map((section) => <button key={section} onClick={() => onSelect(section)} className="admin-stat-card"><span>{section}</span><strong>{counts[section] ?? "—"}</strong><small>Manage →</small></button>)}</div></>; }
+function Overview({ counts, onSelect }) {
+  return (
+    <>
+      <div className="admin-welcome">
+        <p className="admin-eyebrow">Control center</p>
+        <h2>Keep your portfolio current.</h2>
+        <p>Manage the content powering your public portfolio from one place.</p>
+      </div>
+      <div className="admin-stats">
+        {sections.slice(1).map((section) => (
+          <button key={section} onClick={() => onSelect(section)} className="admin-stat-card">
+            <span>{section}</span><strong>{counts[section]}</strong><small>Manage →</small>
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
 
-function ProfileEditor({ profile, onSaved }) { const [form,setForm]=useState({...emptyProfile,...(profile||{})}); const[saving,setSaving]=useState(false); const[status,setStatus]=useState(""); useEffect(()=>setForm({...emptyProfile,...(profile||{})}),[profile]); const update=(k,v)=>setForm(x=>({...x,[k]:v})); const save=async(e)=>{e.preventDefault();setSaving(true);setStatus("");try{const data=await adminRequest("/profile",{method:"PUT",body:JSON.stringify(form)});const saved=Array.isArray(data)?data[0]:data;onSaved(saved);setStatus("Profile saved successfully.");}catch(err){setStatus(err.message||"Failed to save profile.");}finally{setSaving(false);}}; const fields=[["name","Name",true],["headline","Headline"],["email","Email"],["phone","Phone"],["location","Location"],["availability","Availability"],["profile_image_url","Profile image URL"],["resume_url","Resume URL"],["github_url","GitHub URL"],["linkedin_url","LinkedIn URL"],["website_url","Website URL"]]; return <form className="admin-editor" onSubmit={save}><div className="admin-form-grid">{fields.map(([k,l,r])=><label key={k}>{l}<input type={k==="email"?"email":"text"} value={form[k]||""} onChange={e=>update(k,e.target.value)} required={r}/></label>)}</div><label>Bio<textarea rows="7" value={form.bio||""} onChange={e=>update("bio",e.target.value)}/></label>{status&&<div className={status.includes("successfully")?"admin-success":"admin-error"}>{status}</div>}<div className="admin-editor-actions"><button className="admin-primary-button admin-save-button" disabled={saving}>{saving?"Saving...":"Save changes"}</button></div></form>; }
+function ProfileEditor({ value, onSaved }) {
+  const [form, setForm] = useState({ ...empty.profile, ...(value || {}) });
+  const [status, setStatus] = useState("");
+  const [saving, setSaving] = useState(false);
+  useEffect(() => setForm({ ...empty.profile, ...(value || {}) }), [value]);
+  const update = (key, val) => setForm((current) => ({ ...current, [key]: val }));
+  const fields = ["name", "headline", "email", "phone", "location", "availability", "profile_image_url", "resume_url", "github_url", "linkedin_url", "website_url"];
+  const save = async (event) => {
+    event.preventDefault(); setSaving(true); setStatus("");
+    try {
+      const result = await adminRequest("/profile", { method: "PUT", body: JSON.stringify(form) });
+      onSaved(); setStatus("Profile saved successfully.");
+      if (result) setForm((current) => ({ ...current, ...(Array.isArray(result) ? result[0] : result) }));
+    } catch (error) { setStatus(error.message || "Failed to save profile."); }
+    finally { setSaving(false); }
+  };
+  return (
+    <form className="admin-editor" onSubmit={save}>
+      <div className="admin-form-grid">
+        {fields.map((key) => <label key={key}>{labelFor(key)}<input type={key === "email" ? "email" : "text"} value={form[key] || ""} onChange={(e) => update(key, e.target.value)} required={key === "name"} /></label>)}
+      </div>
+      <label>Bio<textarea rows="7" value={form.bio || ""} onChange={(e) => update("bio", e.target.value)} /></label>
+      <SaveStatus status={status} saving={saving} text="Save changes" />
+    </form>
+  );
+}
 
-function ProjectsEditor({projects,onChanged}){const[editing,setEditing]=useState(null);const[status,setStatus]=useState("");const save=async(p)=>{setStatus("");try{const payload={...p,technologies:typeof p.technologies==="string"?p.technologies.split(",").map(v=>v.trim()).filter(Boolean):p.technologies,display_order:Number(p.display_order)||0};await adminRequest(p.id?`/projects/${p.id}`:"/projects",{method:p.id?"PUT":"POST",body:JSON.stringify(payload)});setEditing(null);setStatus(p.id?"Project updated successfully.":"Project created successfully.");await onChanged();}catch(err){setStatus(err.message||"Failed to save project.");}};const remove=async(p)=>{if(!window.confirm(`Delete “${p.title}”?`))return;try{await adminRequest(`/projects/${p.id}`,{method:"DELETE"});setStatus("Project deleted successfully.");await onChanged();}catch(err){setStatus(err.message||"Failed to delete project.");}};if(editing)return <ProjectForm initial={editing} onCancel={()=>setEditing(null)} onSave={save} status={status}/>;return <section><div className="admin-section-toolbar"><p className="admin-muted">{projects.length} project{projects.length===1?"":"s"}</p><button className="admin-primary-button admin-add-button" onClick={()=>setEditing({...emptyProject})}>+ Add project</button></div>{status&&<div className="admin-success">{status}</div>}<div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Project</th><th>Featured</th><th>Order</th><th>Actions</th></tr></thead><tbody>{projects.length?projects.map(p=><tr key={p.id}><td><strong>{p.title}</strong><small>{p.slug}</small></td><td>{p.featured?"Yes":"No"}</td><td>{p.display_order??0}</td><td><button onClick={()=>setEditing({...p,technologies:Array.isArray(p.technologies)?p.technologies.join(", "):p.technologies||""})}>Edit</button><button className="admin-danger-button" onClick={()=>remove(p)}>Delete</button></td></tr>):<tr><td colSpan="4" className="admin-empty-row">No projects yet. Add your first project.</td></tr>}</tbody></table></div></section>;}
-function ProjectForm({initial,onCancel,onSave,status}){const[form,setForm]=useState({...emptyProject,...initial});const update=(k,v)=>setForm(x=>({...x,[k]:v}));return <form className="admin-editor" onSubmit={e=>{e.preventDefault();onSave(form);}}><div className="admin-form-grid"><label>Title<input value={form.title||""} onChange={e=>update("title",e.target.value)} required/></label><label>Slug<input value={form.slug||""} onChange={e=>update("slug",e.target.value)} required/></label><label>Short description<input value={form.short_description||""} onChange={e=>update("short_description",e.target.value)}/></label><label>Image URL<input value={form.image_url||""} onChange={e=>update("image_url",e.target.value)}/></label><label>GitHub URL<input value={form.github_url||""} onChange={e=>update("github_url",e.target.value)}/></label><label>Live URL<input value={form.live_url||""} onChange={e=>update("live_url",e.target.value)}/></label><label>Technologies<input placeholder="React, Node.js, Supabase" value={form.technologies||""} onChange={e=>update("technologies",e.target.value)}/></label><label>Display order<input type="number" value={form.display_order??0} onChange={e=>update("display_order",e.target.value)}/></label></div><label>Description<textarea rows="8" value={form.description||""} onChange={e=>update("description",e.target.value)}/></label><label className="admin-checkbox"><input type="checkbox" checked={Boolean(form.featured)} onChange={e=>update("featured",e.target.checked)}/> Featured project</label>{status&&<div className="admin-error">{status}</div>}<div className="admin-editor-actions"><button type="button" className="admin-secondary-button" onClick={onCancel}>Cancel</button><button className="admin-primary-button admin-save-button">Save project</button></div></form>;}
+function SiteSettingsEditor({ value, onSaved }) {
+  const [form, setForm] = useState({ ...empty.settings, ...(value || {}) });
+  const [status, setStatus] = useState("");
+  const [saving, setSaving] = useState(false);
+  useEffect(() => setForm({ ...empty.settings, ...(value || {}) }), [value]);
+  const update = (key, val) => setForm((current) => ({ ...current, [key]: val }));
+  const save = async (event) => {
+    event.preventDefault(); setSaving(true); setStatus("");
+    try {
+      const endpoint = form.id ? `/site-settings/${form.id}` : "/site-settings";
+      const method = form.id ? "PUT" : "POST";
+      await adminRequest(endpoint, { method, body: JSON.stringify(form) });
+      await onSaved(); setStatus("Site settings saved successfully.");
+    } catch (error) { setStatus(error.message || "Failed to save site settings."); }
+    finally { setSaving(false); }
+  };
+  return (
+    <form className="admin-editor" onSubmit={save}>
+      <div className="admin-form-grid">
+        <label>Site title<input value={form.site_title} onChange={(e) => update("site_title", e.target.value)} required /></label>
+        <label>Accent color<input className="admin-color-input" type="color" value={form.accent_color || "#7c3aed"} onChange={(e) => update("accent_color", e.target.value)} /></label>
+        <label>GitHub username<input value={form.github_username || ""} onChange={(e) => update("github_username", e.target.value)} /></label>
+        <label>LinkedIn URL<input type="url" value={form.linkedin_url || ""} onChange={(e) => update("linkedin_url", e.target.value)} /></label>
+        <label>Contact email<input type="email" value={form.contact_email || ""} onChange={(e) => update("contact_email", e.target.value)} /></label>
+      </div>
+      <label>Site description<textarea rows="6" value={form.site_description || ""} onChange={(e) => update("site_description", e.target.value)} /></label>
+      <SaveStatus status={status} saving={saving} text="Save settings" />
+    </form>
+  );
+}
 
-function SkillsEditor({skills,onChanged}){const[editing,setEditing]=useState(null);const[status,setStatus]=useState("");const save=async(s)=>{setStatus("");try{const payload={...s,proficiency:Number(s.proficiency)||0,display_order:Number(s.display_order)||0};await adminRequest(s.id?`/skills/${s.id}`:"/skills",{method:s.id?"PUT":"POST",body:JSON.stringify(payload)});setEditing(null);setStatus(s.id?"Skill updated successfully.":"Skill created successfully.");await onChanged();}catch(err){setStatus(err.message||"Failed to save skill.");}};const remove=async(s)=>{if(!window.confirm(`Delete “${s.name}”?`))return;try{await adminRequest(`/skills/${s.id}`,{method:"DELETE"});setStatus("Skill deleted successfully.");await onChanged();}catch(err){setStatus(err.message||"Failed to delete skill.");}};if(editing)return <SkillForm initial={editing} onCancel={()=>setEditing(null)} onSave={save} status={status}/>;return <section><div className="admin-section-toolbar"><p className="admin-muted">{skills.length} skill{skills.length===1?"":"s"}</p><button className="admin-primary-button admin-add-button" onClick={()=>setEditing({...emptySkill})}>+ Add skill</button></div>{status&&<div className="admin-success">{status}</div>}<div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Skill</th><th>Category</th><th>Proficiency</th><th>Order</th><th>Actions</th></tr></thead><tbody>{skills.length?skills.map(s=><tr key={s.id}><td><strong>{s.name}</strong><small>{s.icon||"No icon"}</small></td><td>{s.category}</td><td>{s.proficiency??0}%</td><td>{s.display_order??0}</td><td><button onClick={()=>setEditing({...s})}>Edit</button><button className="admin-danger-button" onClick={()=>remove(s)}>Delete</button></td></tr>):<tr><td colSpan="5" className="admin-empty-row">No skills yet. Add your first skill.</td></tr>}</tbody></table></div></section>;}
-function SkillForm({initial,onCancel,onSave,status}){const[form,setForm]=useState({...emptySkill,...initial});const update=(k,v)=>setForm(x=>({...x,[k]:v}));return <form className="admin-editor" onSubmit={e=>{e.preventDefault();onSave(form);}}><div className="admin-form-grid"><label>Name<input value={form.name||""} onChange={e=>update("name",e.target.value)} required/></label><label>Category<input value={form.category||""} onChange={e=>update("category",e.target.value)} required/></label><label>Icon<input placeholder="react / python / database" value={form.icon||""} onChange={e=>update("icon",e.target.value)}/></label><label>Proficiency (%)<input type="number" min="0" max="100" value={form.proficiency??0} onChange={e=>update("proficiency",e.target.value)}/></label><label>Display order<input type="number" min="0" value={form.display_order??0} onChange={e=>update("display_order",e.target.value)}/></label></div>{status&&<div className="admin-error">{status}</div>}<div className="admin-editor-actions"><button type="button" className="admin-secondary-button" onClick={onCancel}>Cancel</button><button className="admin-primary-button admin-save-button">Save skill</button></div></form>;}
+function ResourceEditor({ config, items, onChanged }) {
+  const [editing, setEditing] = useState(null);
+  const [status, setStatus] = useState("");
 
-function ExperienceEditor({experience,onChanged}){const[editing,setEditing]=useState(null);const[status,setStatus]=useState("");const save=async(x)=>{setStatus("");try{const payload={...x,technologies:typeof x.technologies==="string"?x.technologies.split(",").map(v=>v.trim()).filter(Boolean):x.technologies,display_order:Number(x.display_order)||0,current:Boolean(x.current)};await adminRequest(x.id?`/experience/${x.id}`:"/experience",{method:x.id?"PUT":"POST",body:JSON.stringify(payload)});setEditing(null);setStatus(x.id?"Experience updated successfully.":"Experience created successfully.");await onChanged();}catch(err){setStatus(err.message||"Failed to save experience.");}};const remove=async(x)=>{if(!window.confirm(`Delete “${x.role} at ${x.company}”?`))return;try{await adminRequest(`/experience/${x.id}`,{method:"DELETE"});setStatus("Experience deleted successfully.");await onChanged();}catch(err){setStatus(err.message||"Failed to delete experience.");}};if(editing)return <ExperienceForm initial={editing} onCancel={()=>setEditing(null)} onSave={save} status={status}/>;return <section><div className="admin-section-toolbar"><p className="admin-muted">{experience.length} experience entr{experience.length===1?"y":"ies"}</p><button className="admin-primary-button admin-add-button" onClick={()=>setEditing({...emptyExperience})}>+ Add experience</button></div>{status&&<div className="admin-success">{status}</div>}<div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Role</th><th>Company</th><th>Period</th><th>Order</th><th>Actions</th></tr></thead><tbody>{experience.length?experience.map(x=><tr key={x.id}><td><strong>{x.role}</strong><small>{x.location||""}</small></td><td>{x.company}</td><td>{x.start_date||"—"} → {x.current?"Present":x.end_date||"—"}</td><td>{x.display_order??0}</td><td><button onClick={()=>setEditing({...x,technologies:Array.isArray(x.technologies)?x.technologies.join(", "):x.technologies||""})}>Edit</button><button className="admin-danger-button" onClick={()=>remove(x)}>Delete</button></td></tr>):<tr><td colSpan="5" className="admin-empty-row">No experience entries yet.</td></tr>}</tbody></table></div></section>;}
-function ExperienceForm({initial,onCancel,onSave,status}){const[form,setForm]=useState({...emptyExperience,...initial});const update=(k,v)=>setForm(x=>({...x,[k]:v));return <form className="admin-editor" onSubmit={e=>{e.preventDefault();onSave(form);}}><div className="admin-form-grid"><label>Company<input value={form.company||""} onChange={e=>update("company",e.target.value)} required/></label><label>Role<input value={form.role||""} onChange={e=>update("role",e.target.value)} required/></label><label>Location<input value={form.location||""} onChange={e=>update("location",e.target.value)}/></label><label>Start date<input type="date" value={form.start_date||""} onChange={e=>update("start_date",e.target.value)}/></label><label>End date<input type="date" value={form.end_date||""} onChange={e=>update("end_date",e.target.value)} disabled={form.current}/></label><label>Technologies<input placeholder="React, Node.js" value={form.technologies||""} onChange={e=>update("technologies",e.target.value)}/></label><label>Display order<input type="number" min="0" value={form.display_order??0} onChange={e=>update("display_order",e.target.value)}/></label></div><label>Description<textarea rows="7" value={form.description||""} onChange={e=>update("description",e.target.value)}/></label><label className="admin-checkbox"><input type="checkbox" checked={Boolean(form.current)} onChange={e=>update("current",e.target.checked)}/> Currently working here</label>{status&&<div className="admin-error">{status}</div>}<div className="admin-editor-actions"><button type="button" className="admin-secondary-button" onClick={onCancel}>Cancel</button><button className="admin-primary-button admin-save-button">Save experience</button></div></form>;}
+  const save = async (item) => {
+    setStatus("");
+    try {
+      const payload = normalizePayload(config.key, item);
+      const endpoint = item.id ? `/${config.endpoint}/${item.id}` : `/${config.endpoint}`;
+      const method = item.id ? "PUT" : "POST";
+      await adminRequest(endpoint, { method, body: JSON.stringify(payload) });
+      setEditing(null);
+      setStatus(`${config.singular[0].toUpperCase()}${config.singular.slice(1)} ${item.id ? "updated" : "created"} successfully.`);
+      await onChanged();
+    } catch (error) { setStatus(error.message || `Failed to save ${config.singular}.`); }
+  };
 
-function EducationEditor({education,onChanged}){const[editing,setEditing]=useState(null);const[status,setStatus]=useState("");const save=async(e)=>{setStatus("");try{const payload={...e,display_order:Number(e.display_order)||0};await adminRequest(e.id?`/education/${e.id}`:"/education",{method:e.id?"PUT":"POST",body:JSON.stringify(payload)});setEditing(null);setStatus(e.id?"Education updated successfully.":"Education created successfully.");await onChanged();}catch(err){setStatus(err.message||"Failed to save education.");}};const remove=async(e)=>{if(!window.confirm(`Delete “${e.degree} at ${e.institution}”?`))return;try{await adminRequest(`/education/${e.id}`,{method:"DELETE"});setStatus("Education deleted successfully.");await onChanged();}catch(err){setStatus(err.message||"Failed to delete education.");}};if(editing)return <EducationForm initial={editing} onCancel={()=>setEditing(null)} onSave={save} status={status}/>;return <section><div className="admin-section-toolbar"><p className="admin-muted">{education.length} education record{education.length===1?"":"s"}</p><button className="admin-primary-button admin-add-button" onClick={()=>setEditing({...emptyEducation})}>+ Add education</button></div>{status&&<div className="admin-success">{status}</div>}<div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Degree</th><th>Institution</th><th>Period</th><th>Order</th><th>Actions</th></tr></thead><tbody>{education.length?education.map(e=><tr key={e.id}><td><strong>{e.degree}</strong><small>{e.field||""}</small></td><td>{e.institution}</td><td>{e.start_date||"—"} → {e.end_date||"—"}</td><td>{e.display_order??0}</td><td><button onClick={()=>setEditing({...e})}>Edit</button><button className="admin-danger-button" onClick={()=>remove(e)}>Delete</button></td></tr>):<tr><td colSpan="5" className="admin-empty-row">No education records yet.</td></tr>}</tbody></table></div></section>;}
-function EducationForm({initial,onCancel,onSave,status}){const[form,setForm]=useState({...emptyEducation,...initial});const update=(k,v)=>setForm(x=>({...x,[k]:v}));return <form className="admin-editor" onSubmit={e=>{e.preventDefault();onSave(form);}}><div className="admin-form-grid"><label>Institution<input value={form.institution||""} onChange={e=>update("institution",e.target.value)} required/></label><label>Degree<input value={form.degree||""} onChange={e=>update("degree",e.target.value)} required/></label><label>Field of study<input value={form.field||""} onChange={e=>update("field",e.target.value)}/></label><label>Location<input value={form.location||""} onChange={e=>update("location",e.target.value)}/></label><label>Start date<input type="date" value={form.start_date||""} onChange={e=>update("start_date",e.target.value)}/></label><label>End date<input type="date" value={form.end_date||""} onChange={e=>update("end_date",e.target.value)}/></label><label>Display order<input type="number" min="0" value={form.display_order??0} onChange={e=>update("display_order",e.target.value)}/></label></div><label>Description<textarea rows="7" value={form.description||""} onChange={e=>update("description",e.target.value)}/></label>{status&&<div className="admin-error">{status}</div>}<div className="admin-editor-actions"><button type="button" className="admin-secondary-button" onClick={onCancel}>Cancel</button><button className="admin-primary-button admin-save-button">Save education</button></div></form>;}
+  const remove = async (item) => {
+    if (!item.id || !window.confirm(`Delete “${displayName(config.key, item)}”?`)) return;
+    try {
+      await adminRequest(`/${config.endpoint}/${item.id}`, { method: "DELETE" });
+      setStatus(`${config.singular[0].toUpperCase()}${config.singular.slice(1)} deleted successfully.`);
+      await onChanged();
+    } catch (error) { setStatus(error.message || `Failed to delete ${config.singular}.`); }
+  };
 
-function SocialLinksEditor({socialLinks,onChanged}){const[editing,setEditing]=useState(null);const[status,setStatus]=useState("");const save=async(link)=>{setStatus("");try{const payload={...link,display_order:Number(link.display_order)||0};await adminRequest(link.id?`/social-links/${link.id}`:"/social-links",{method:link.id?"PUT":"POST",body:JSON.stringify(payload)});setEditing(null);setStatus(link.id?"Social link updated successfully.":"Social link created successfully.");await onChanged();}catch(err){setStatus(err.message||"Failed to save social link.");}};const remove=async(link)=>{if(!window.confirm(`Delete “${link.platform}”?`))return;try{await adminRequest(`/social-links/${link.id}`,{method:"DELETE"});setStatus("Social link deleted successfully.");await onChanged();}catch(err){setStatus(err.message||"Failed to delete social link.");}};if(editing)return <SocialLinkForm initial={editing} onCancel={()=>setEditing(null)} onSave={save} status={status}/>;return <section><div className="admin-section-toolbar"><p className="admin-muted">{socialLinks.length} social link{socialLinks.length===1?"":"s"}</p><button className="admin-primary-button admin-add-button" onClick={()=>setEditing({...emptySocialLink})}>+ Add social link</button></div>{status&&<div className="admin-success">{status}</div>}<div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Platform</th><th>URL</th><th>Icon</th><th>Order</th><th>Actions</th></tr></thead><tbody>{socialLinks.length?socialLinks.map(link=><tr key={link.id}><td><strong>{link.platform}</strong></td><td><a href={link.url} target="_blank" rel="noreferrer">{link.url}</a></td><td>{link.icon||"—"}</td><td>{link.display_order??0}</td><td><button onClick={()=>setEditing({...link})}>Edit</button><button className="admin-danger-button" onClick={()=>remove(link)}>Delete</button></td></tr>):<tr><td colSpan="5" className="admin-empty-row">No social links yet. Add your first link.</td></tr>}</tbody></table></div></section>;}
-function SocialLinkForm({initial,onCancel,onSave,status}){const[form,setForm]=useState({...emptySocialLink,...initial});const update=(k,v)=>setForm(x=>({...x,[k]:v}));return <form className="admin-editor" onSubmit={e=>{e.preventDefault();onSave(form);}}><div className="admin-form-grid"><label>Platform<input placeholder="GitHub, LinkedIn, Instagram" value={form.platform||""} onChange={e=>update("platform",e.target.value)} required/></label><label>URL<input type="url" placeholder="https://..." value={form.url||""} onChange={e=>update("url",e.target.value)} required/></label><label>Icon<input placeholder="github / linkedin / instagram" value={form.icon||""} onChange={e=>update("icon",e.target.value)}/></label><label>Display order<input type="number" min="0" value={form.display_order??0} onChange={e=>update("display_order",e.target.value)}/></label></div>{status&&<div className="admin-error">{status}</div>}<div className="admin-editor-actions"><button type="button" className="admin-secondary-button" onClick={onCancel}>Cancel</button><button className="admin-primary-button admin-save-button">Save social link</button></div></form>;}
+  if (editing) return <DynamicForm config={config} initial={editing} onCancel={() => setEditing(null)} onSave={save} status={status} />;
 
-function SiteSettingsEditor({settings,onSaved}){const[form,setForm]=useState({...emptySiteSettings,...(settings||{})});const[saving,setSaving]=useState(false);const[status,setStatus]=useState("");useEffect(()=>setForm({...emptySiteSettings,...(settings||{})}),[settings]);const update=(k,v)=>setForm(x=>({...x,[k]:v}));const save=async(e)=>{e.preventDefault();setSaving(true);setStatus("");try{const data=await adminRequest(settings?.id?`/site-settings/${settings.id}`:"/site-settings",{method:settings?.id?"PUT":"POST",body:JSON.stringify(form)});onSaved(Array.isArray(data)?data[0]:data);setStatus("Site settings saved successfully.");}catch(err){setStatus(err.message||"Failed to save site settings.");}finally{setSaving(false);}};return <form className="admin-editor" onSubmit={save}><div className="admin-form-grid"><label>Site title<input value={form.site_title||""} onChange={e=>update("site_title",e.target.value)} required/></label><label>Accent color<input className="admin-color-input" type="color" value={form.accent_color||"#7c3aed"} onChange={e=>update("accent_color",e.target.value)}/></label><label>GitHub username<input value={form.github_username||""} onChange={e=>update("github_username",e.target.value)}/></label><label>LinkedIn URL<input type="url" value={form.linkedin_url||""} onChange={e=>update("linkedin_url",e.target.value)}/></label><label>Contact email<input type="email" value={form.contact_email||""} onChange={e=>update("contact_email",e.target.value)}/></label></div><label>Site description<textarea rows="6" value={form.site_description||""} onChange={e=>update("site_description",e.target.value)}/></label>{status&&<div className={status.includes("successfully")?"admin-success":"admin-error"}>{status}</div>}<div className="admin-editor-actions"><button className="admin-primary-button admin-save-button" disabled={saving}>{saving?"Saving...":"Save settings"}</button></div></form>;}
+  return (
+    <section>
+      <div className="admin-section-toolbar">
+        <p className="admin-muted">{items.length} {config.singular}{items.length === 1 ? "" : "s"}</p>
+        <button type="button" className="admin-primary-button admin-add-button" onClick={() => setEditing(makeEmpty(config))}>+ Add {config.singular}</button>
+      </div>
+      {status && <div className={status.includes("successfully") ? "admin-success" : "admin-error"}>{status}</div>}
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead><tr>{config.columns.map((field) => <th key={field}>{labelFor(field)}</th>)}<th>Actions</th></tr></thead>
+          <tbody>
+            {items.length ? items.map((item) => <tr key={item.id}>{config.columns.map((field) => <td key={field}>{formatValue(item[field], field)}</td>)}<td><button type="button" onClick={() => setEditing(editValue(config, item))}>Edit</button><button type="button" className="admin-danger-button" onClick={() => remove(item)}>Delete</button></td></tr>) : <tr><td colSpan={config.columns.length + 1} className="admin-empty-row">No {config.singular}s yet.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function DynamicForm({ config, initial, onCancel, onSave, status }) {
+  const [form, setForm] = useState(initial);
+  const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
+  return (
+    <form className="admin-editor" onSubmit={(event) => { event.preventDefault(); onSave(form); }}>
+      <div className="admin-form-grid">
+        {config.fields.map((field) => {
+          if (field === "description") return null;
+          if (field === "featured" || field === "current") return <label className="admin-checkbox" key={field}><input type="checkbox" checked={Boolean(form[field])} onChange={(e) => update(field, e.target.checked)} /> {labelFor(field)}</label>;
+          const type = field.includes("date") ? "date" : field === "proficiency" || field === "display_order" ? "number" : field === "url" || field.endsWith("_url") ? "url" : "text";
+          return <label key={field}>{labelFor(field)}<input type={type} min={type === "number" ? "0" : undefined} max={field === "proficiency" ? "100" : undefined} value={form[field] ?? ""} onChange={(e) => update(field, e.target.value)} required={field === "name" || field === "title" || field === "slug" || field === "company" || field === "role" || field === "institution" || field === "degree" || field === "platform"} /></label>;
+        })}
+      </div>
+      {config.fields.includes("description") && <label>Description<textarea rows="7" value={form.description || ""} onChange={(e) => update("description", e.target.value)} /></label>}
+      {status && <div className="admin-error">{status}</div>}
+      <div className="admin-editor-actions"><button type="button" className="admin-secondary-button" onClick={onCancel}>Cancel</button><button className="admin-primary-button admin-save-button">Save {config.singular}</button></div>
+    </form>
+  );
+}
+
+function SaveStatus({ status, saving, text }) {
+  return <>{status && <div className={status.includes("successfully") ? "admin-success" : "admin-error"}>{status}</div>}<div className="admin-editor-actions"><button className="admin-primary-button admin-save-button" disabled={saving}>{saving ? "Saving..." : text}</button></div></>;
+}
+
+function makeEmpty(config) { return { ...empty[config.key] }; }
+function editValue(config, item) { return { ...item, technologies: Array.isArray(item.technologies) ? item.technologies.join(", ") : item.technologies || "" }; }
+function displayName(key, item) { return item.title || item.name || item.role || item.degree || item.platform || item.company || "this item"; }
+function labelFor(key) { return key.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()); }
+function formatValue(value, field) { if (Array.isArray(value)) return value.join(", "); if (typeof value === "boolean") return value ? "Yes" : "No"; if (value === null || value === undefined || value === "") return "—"; return String(value); }
+function normalizePayload(key, item) {
+  const payload = { ...item };
+  if ("display_order" in payload) payload.display_order = Number(payload.display_order) || 0;
+  if ("proficiency" in payload) payload.proficiency = Number(payload.proficiency) || 0;
+  if ("technologies" in payload && typeof payload.technologies === "string") payload.technologies = payload.technologies.split(",").map((value) => value.trim()).filter(Boolean);
+  if ("current" in payload) payload.current = Boolean(payload.current);
+  if ("featured" in payload) payload.featured = Boolean(payload.featured);
+  return payload;
+}
 
 export default AdminDashboard;
