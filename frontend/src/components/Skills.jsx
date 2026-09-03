@@ -45,35 +45,33 @@ function getCategoryIcon(category) {
 }
 
 function Skills({ skills }) {
-  if (!skills || skills.length === 0) {
-    return null;
-  }
+  if (!Array.isArray(skills) || skills.length === 0) return null;
 
   const groupedSkills = skills.reduce((groups, skill) => {
-    const category = skill.category || "Other";
+    if (!skill || typeof skill !== "object") return groups;
+    const category = String(skill.category || "Other").trim() || "Other";
 
-    if (!groups[category]) {
-      groups[category] = [];
-    }
-
+    if (!groups[category]) groups[category] = [];
     groups[category].push(skill);
-
     return groups;
   }, {});
 
+  const categories = Object.entries(groupedSkills).filter(([, categorySkills]) => categorySkills.length > 0);
+  if (categories.length === 0) return null;
+
   return (
-    <section id="skills" className="section">
+    <section id="skills" className="section" aria-labelledby="skills-title">
       <div className="section-container">
         <Reveal>
           <div className="skills-heading">
             <p className="section-label">EXPERTISE</p>
-            <h2>Skills</h2>
+            <h2 id="skills-title">Skills</h2>
             <p className="section-intro">Technologies and tools I work with.</p>
           </div>
         </Reveal>
 
         <div className="skills-categories">
-          {Object.entries(groupedSkills).map(([category, categorySkills], categoryIndex) => (
+          {categories.map(([category, categorySkills], categoryIndex) => (
             <Reveal key={category} delay={categoryIndex * 0.08}>
               <div className="skills-category">
                 <div className="skills-category-header">
@@ -83,7 +81,6 @@ function Skills({ skills }) {
                     </span>
                     <h3>{category}</h3>
                   </div>
-
                   <span className="skills-count">
                     {categorySkills.length}
                     {categorySkills.length === 1 ? " skill" : " skills"}
@@ -98,14 +95,14 @@ function Skills({ skills }) {
                         : null;
 
                     return (
-                      <Reveal key={skill.id || `${category}-${skill.name}`} delay={skillIndex * 0.05}>
+                      <Reveal key={skill.id || `${category}-${skill.name || skillIndex}`} delay={skillIndex * 0.05}>
                         <article className="skill-card">
                           <div className="skill-card-top">
                             <div className="skill-identity">
                               <span className="skill-icon" aria-hidden="true">
                                 <Icon icon={getSkillIcon(skill.name)} width="22" height="22" />
                               </span>
-                              <h4>{skill.name}</h4>
+                              <h4>{skill.name || "Unnamed skill"}</h4>
                             </div>
 
                             {proficiency !== null && (
@@ -115,11 +112,15 @@ function Skills({ skills }) {
 
                           {proficiency !== null && (
                             <div className="skill-proficiency">
-                              <div className="proficiency-track" aria-hidden="true">
-                                <div
-                                  className="proficiency-fill"
-                                  style={{ width: `${proficiency}%` }}
-                                />
+                              <div
+                                className="proficiency-track"
+                                role="progressbar"
+                                aria-label={`${skill.name || "Skill"} proficiency`}
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                aria-valuenow={proficiency}
+                              >
+                                <div className="proficiency-fill" style={{ width: `${proficiency}%` }} />
                               </div>
                             </div>
                           )}
