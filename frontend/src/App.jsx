@@ -28,7 +28,16 @@ import "./mobile-responsive.css";
 
 const firstRecord = (value) => (Array.isArray(value) ? value[0] || null : value || null);
 const records = (value) => (Array.isArray(value) ? value : value ? [value] : []);
-const defaultVisibility = { hero: true, about: true, skills: true, experience: true, education: true, projects: true, contact: true };
+const defaultVisibility = {
+  hero: true,
+  about: true,
+  skills: true,
+  experience: true,
+  education: true,
+  projects: true,
+  contact: true,
+  footer: true,
+};
 
 function App() {
   const [portfolio, setPortfolio] = useState({ profile: null, projects: [], skills: [], experience: [], education: [], socialLinks: [], siteSettings: null });
@@ -78,7 +87,7 @@ function App() {
         {visibility.projects && <Projects projects={portfolio.projects} />}
         {visibility.contact && <SocialLinks links={portfolio.socialLinks} />}
       </main>
-      <Footer siteSettings={portfolio.siteSettings} />
+      {visibility.footer && <Footer siteSettings={portfolio.siteSettings} />}
     </>
   );
 }
