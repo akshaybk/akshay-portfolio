@@ -55,16 +55,14 @@ function Hero({ profile, visibility = {} }) {
           <a className="hero-primary-action" href={workTarget}>
             {visibility.projects !== false ? "View my work" : "Explore"} <span aria-hidden="true">↗</span>
           </a>
-          {resumeUrl && (
-            <a
-              className="hero-secondary-action"
-              href={resumeUrl}
-              download
-              aria-label="Download CV"
-            >
-              Download CV <span aria-hidden="true">↓</span>
-            </a>
-          )}
+          <a
+            className="hero-secondary-action"
+            href={resumeUrl || "#contact"}
+            {...(resumeUrl ? { download: true } : {})}
+            aria-label={resumeUrl ? "Download CV" : "Contact me about my CV"}
+          >
+            {resumeUrl ? "Download CV" : "CV"} <span aria-hidden="true">↓</span>
+          </a>
         </motion.div>
 
         {(githubUrl || linkedinUrl) && (
