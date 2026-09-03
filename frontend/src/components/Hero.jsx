@@ -1,9 +1,15 @@
 import { motion } from "framer-motion";
 
 function Hero({ profile, visibility = {} }) {
-  const data = profile;
+  if (!profile || typeof profile !== "object") return null;
 
-  if (!data) return null;
+  const name = typeof profile.name === "string" ? profile.name.trim() : "";
+  const headline = typeof profile.headline === "string" ? profile.headline.trim() : "";
+  const bio = typeof profile.bio === "string" ? profile.bio.trim() : "";
+  const availability = typeof profile.availability === "string" ? profile.availability.trim() : "";
+  const resumeUrl = typeof profile.resume_url === "string" ? profile.resume_url.trim() : "";
+  const githubUrl = typeof profile.github_url === "string" ? profile.github_url.trim() : "";
+  const linkedinUrl = typeof profile.linkedin_url === "string" ? profile.linkedin_url.trim() : "";
 
   const nextSection = [
     { key: "about", id: "about" },
@@ -21,93 +27,47 @@ function Hero({ profile, visibility = {} }) {
       : "#";
 
   return (
-    <section id="home" className="hero-section">
+    <section id="home" className="hero-section" aria-labelledby="hero-title">
       <div className="hero-background" aria-hidden="true">
         <span className="hero-orb hero-orb-one" />
         <span className="hero-orb hero-orb-two" />
       </div>
 
       <div className="hero-content">
-        <motion.div
-          className="hero-eyebrow"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div className="hero-eyebrow" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <span className="hero-status-dot" aria-hidden="true" />
-          {data.availability || "Open to opportunities"}
+          {availability || "Open to opportunities"}
         </motion.div>
 
-        <motion.p
-          className="hero-kicker"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.05 }}
-        >
+        <motion.p className="hero-kicker" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.05 }}>
           Hello, I'm
         </motion.p>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.1 }}
-        >
-          {data.name}
+        <motion.h1 id="hero-title" initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.1 }}>
+          {name || "Portfolio"}
         </motion.h1>
 
-        {data.headline && (
-          <motion.h2
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.2 }}
-          >
-            {data.headline}
-          </motion.h2>
-        )}
+        {headline && <motion.h2 initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.2 }}>{headline}</motion.h2>}
 
-        {data.bio && (
-          <motion.p
-            className="hero-bio"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            {data.bio}
-          </motion.p>
-        )}
+        {bio && <motion.p className="hero-bio" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>{bio}</motion.p>}
 
-        <motion.div
-          className="hero-actions"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
+        <motion.div className="hero-actions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}>
           <a className="hero-primary-action" href={workTarget}>
             {visibility.projects !== false ? "View my work" : "Explore"} <span aria-hidden="true">↗</span>
           </a>
-          {data.resume_url && <a className="hero-secondary-action" href={data.resume_url} target="_blank" rel="noopener noreferrer">Résumé</a>}
+          {resumeUrl && <a className="hero-secondary-action" href={resumeUrl} target="_blank" rel="noopener noreferrer">Résumé</a>}
         </motion.div>
 
-        {(data.github_url || data.linkedin_url) && (
-          <motion.div
-            className="hero-socials"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.55 }}
-          >
+        {(githubUrl || linkedinUrl) && (
+          <motion.div className="hero-socials" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.55 }}>
             <span>Find me on</span>
-            {data.github_url && <a href={data.github_url} target="_blank" rel="noopener noreferrer">GitHub</a>}
-            {data.linkedin_url && <a href={data.linkedin_url} target="_blank" rel="noopener noreferrer">LinkedIn</a>}
+            {githubUrl && <a href={githubUrl} target="_blank" rel="noopener noreferrer">GitHub</a>}
+            {linkedinUrl && <a href={linkedinUrl} target="_blank" rel="noopener noreferrer">LinkedIn</a>}
           </motion.div>
         )}
       </div>
 
-      {nextSection && (
-        <a className="hero-scroll-hint" href={`#${nextSection.id}`} aria-label={`Scroll to ${nextSection.id} section`}>
-          <span>Scroll to explore</span>
-          <span aria-hidden="true">↓</span>
-        </a>
-      )}
+      {nextSection && <a className="hero-scroll-hint" href={`#${nextSection.id}`} aria-label={`Scroll to ${nextSection.id} section`}><span>Scroll to explore</span><span aria-hidden="true">↓</span></a>}
     </section>
   );
 }
