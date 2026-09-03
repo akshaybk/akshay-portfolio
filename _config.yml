@@ -1,0 +1,7 @@
+# GitHub Pages configuration
+# The repository contains a Node.js backend for local/API hosting. Jekyll
+# should ignore its dependencies and other package-manager directories.
+exclude:
+  - backend/node_modules
+  - frontend/node_modules
+  - node_modules
