@@ -55,7 +55,6 @@ function Hero({ profile, visibility = {} }) {
         <motion.div className="hero-actions" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}>
           <a className="hero-primary-action" href={workTarget}>
             <span>{visibility.projects !== false ? "View my work" : "Explore"}</span>
-            <span aria-hidden="true">→</span>
           </a>
           <a
             className="hero-secondary-action"
@@ -64,7 +63,6 @@ function Hero({ profile, visibility = {} }) {
             aria-label={resumeUrl ? "Download CV" : "CV - add your CV in the admin dashboard"}
           >
             <span>Download CV</span>
-            <span className="hero-download-icon" aria-hidden="true">↓</span>
           </a>
         </motion.div>
 
