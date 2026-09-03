@@ -1,21 +1,35 @@
 import Reveal from "./Reveal";
 
 function Education({ education }) {
-  if (!education || education.length === 0) return null;
+  if (!Array.isArray(education) || education.length === 0) return null;
 
-  const sortedEducation = [...education].sort((a, b) => new Date(b.start_date || 0) - new Date(a.start_date || 0));
+  const sortedEducation = education
+    .filter((item) => item && typeof item === "object")
+    .sort((a, b) => new Date(b.start_date || 0) - new Date(a.start_date || 0));
+
+  if (sortedEducation.length === 0) return null;
 
   return (
-    <section id="education" className="section">
+    <section id="education" className="section" aria-labelledby="education-title">
       <div className="section-container">
-        <Reveal><div className="education-heading"><p className="section-label">EDUCATION</p><h2>Education</h2><p className="section-intro">My academic background and learning journey.</p></div></Reveal>
+        <Reveal>
+          <div className="education-heading">
+            <p className="section-label">EDUCATION</p>
+            <h2 id="education-title">Education</h2>
+            <p className="section-intro">My academic background and learning journey.</p>
+          </div>
+        </Reveal>
         <div className="education-list">
           {sortedEducation.map((item, index) => (
-            <Reveal key={item.id} delay={index * 0.08}>
+            <Reveal key={item.id || `${item.degree || "education"}-${index}`} delay={index * 0.08}>
               <article className="education-item">
-                <div className="education-period">{item.start_date && <span>{formatDate(item.start_date)}</span>}{item.start_date && <span>—</span>}<span>{item.end_date ? formatDate(item.end_date) : "Present"}</span></div>
+                <div className="education-period">
+                  {item.start_date && <time dateTime={item.start_date}>{formatDate(item.start_date)}</time>}
+                  {item.start_date && <span aria-hidden="true">—</span>}
+                  <time dateTime={item.end_date || undefined}>{item.end_date ? formatDate(item.end_date) : "Present"}</time>
+                </div>
                 <div className="education-content">
-                  <h3>{item.degree}</h3>
+                  <h3>{item.degree || "Education"}</h3>
                   {item.field && <p className="education-field">{item.field}</p>}
                   {item.institution && <p className="education-institution">{item.institution}</p>}
                   {item.location && <p className="education-location">{item.location}</p>}
