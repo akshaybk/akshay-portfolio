@@ -34,38 +34,36 @@ function SocialLinks({ links }) {
   };
 
   return (
-    <section id="contact" className="section contact-section">
+    <section id="contact" className="section contact-section" aria-labelledby="contact-title">
       <div className="section-container">
         <Reveal>
           <div className="contact-content">
             <p className="section-label">CONTACT</p>
 
-            <h2>Let's Connect</h2>
+            <h2 id="contact-title">Let's Connect</h2>
 
             <p className="contact-description">
               Interested in working together, discussing a project,
               or simply saying hello? Feel free to reach out.
             </p>
 
-            <div className="social-links">
+            <div className="social-links" aria-label="Social and contact links">
               {sortedLinks.map((link, index) => (
-                <Reveal
-                  key={link.id}
-                  delay={index * 0.08}
-                >
+                <Reveal key={link.id} delay={index * 0.08}>
                   <a
                     href={link.url}
                     target="_blank"
                     rel="noreferrer"
                     className="social-link"
+                    aria-label={`Open ${link.platform} in a new tab`}
                   >
-                    <span className="social-icon">
+                    <span className="social-icon" aria-hidden="true">
                       {getIcon(link.platform)}
                     </span>
 
                     <span>{link.platform}</span>
 
-                    <span className="social-arrow">
+                    <span className="social-arrow" aria-hidden="true">
                       ↗
                     </span>
                   </a>
