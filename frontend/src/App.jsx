@@ -39,6 +39,55 @@ const defaultVisibility = {
   footer: true,
 };
 
+function PortfolioSkeleton() {
+  return (
+    <div className="skeleton-page" aria-hidden="true">
+      <div className="skeleton-navbar">
+        <span className="skeleton-block skeleton-logo" />
+        <div className="skeleton-nav-links">
+          <span className="skeleton-block" />
+          <span className="skeleton-block" />
+          <span className="skeleton-block" />
+          <span className="skeleton-block" />
+          <span className="skeleton-block" />
+        </div>
+      </div>
+
+      <section className="skeleton-hero">
+        <div className="skeleton-hero-content">
+          <span className="skeleton-block skeleton-status" />
+          <span className="skeleton-block skeleton-kicker" />
+          <span className="skeleton-block skeleton-title" />
+          <span className="skeleton-block skeleton-headline" />
+          <span className="skeleton-block skeleton-headline-short" />
+          <span className="skeleton-block skeleton-bio" />
+          <div className="skeleton-actions">
+            <span className="skeleton-block skeleton-button" />
+            <span className="skeleton-block skeleton-button skeleton-button-secondary" />
+          </div>
+          <div className="skeleton-socials">
+            <span className="skeleton-block" />
+            <span className="skeleton-block" />
+            <span className="skeleton-block" />
+          </div>
+        </div>
+      </section>
+
+      <section className="skeleton-section">
+        <div className="skeleton-section-heading">
+          <span className="skeleton-block skeleton-label" />
+          <span className="skeleton-block skeleton-section-title" />
+        </div>
+        <div className="skeleton-section-lines">
+          <span className="skeleton-block" />
+          <span className="skeleton-block" />
+          <span className="skeleton-block skeleton-line-short" />
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function App() {
   const [portfolio, setPortfolio] = useState({ profile: null, projects: [], skills: [], experience: [], education: [], socialLinks: [], siteSettings: null });
   const [loading, setLoading] = useState(true);
@@ -70,7 +119,7 @@ function App() {
     document.title = title;
   }, [portfolio.siteSettings, portfolio.profile]);
 
-  if (loading) return <div className="loading-screen" role="status" aria-live="polite">Loading portfolio...</div>;
+  if (loading) return <PortfolioSkeleton />;
   if (error) return <div className="error-screen" role="alert">{error}</div>;
 
   const visibility = { ...defaultVisibility, ...(portfolio.siteSettings?.section_visibility || {}) };
