@@ -79,7 +79,7 @@ function App() {
     <>
       <Navbar profile={portfolio.profile} visibility={visibility} />
       <main>
-        {visibility.hero && <Hero profile={portfolio.profile} siteSettings={portfolio.siteSettings} />}
+        {visibility.hero && <Hero profile={portfolio.profile} visibility={visibility} />}
         {visibility.about && <About profile={portfolio.profile} />}
         {visibility.skills && <Skills skills={portfolio.skills} />}
         {visibility.experience && <Experience experience={portfolio.experience} />}
