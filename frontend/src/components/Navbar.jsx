@@ -19,22 +19,34 @@ function Navbar({ profile, visibility = {} }) {
   useEffect(() => {
     const handleScroll = () => {
       const sections = links.map((link) => document.getElementById(link.id)).filter(Boolean);
+      if (sections.length === 0) {
+        setActiveSection("");
+        return;
+      }
+
       const scrollPosition = window.scrollY + 180;
-      let currentSection = sections[0]?.id || "home";
+      let currentSection = sections[0].id;
       for (const section of sections) {
         if (section.offsetTop <= scrollPosition) currentSection = section.id;
         else break;
       }
       setActiveSection(currentSection);
     };
+
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, [visibility]);
 
   useEffect(() => {
     if (!menuOpen) return undefined;
-    const handleKeyDown = (event) => { if (event.key === "Escape") setMenuOpen(false); };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen]);
@@ -44,11 +56,22 @@ function Navbar({ profile, visibility = {} }) {
   return (
     <nav className="navbar" aria-label="Primary navigation">
       <a href={visibility.hero !== false ? "#home" : "#"} className="navbar-logo" onClick={handleNavigation}>{name}</a>
-      <button type="button" className={`navbar-menu-button ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} aria-controls="primary-navigation">
+      <button
+        type="button"
+        className={`navbar-menu-button ${menuOpen ? "open" : ""}`}
+        onClick={() => setMenuOpen((open) => !open)}
+        aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+        aria-expanded={menuOpen}
+        aria-controls="primary-navigation"
+      >
         <span /><span /><span />
       </button>
       <div id="primary-navigation" className={`navbar-links ${menuOpen ? "open" : ""}`}>
-        {links.map((link) => <a key={link.id} href={`#${link.id}`} className={activeSection === link.id ? "active" : ""} onClick={handleNavigation}>{link.label}</a>)}
+        {links.map((link) => (
+          <a key={link.id} href={`#${link.id}`} className={activeSection === link.id ? "active" : ""} onClick={handleNavigation}>
+            {link.label}
+          </a>
+        ))}
       </div>
     </nav>
   );
