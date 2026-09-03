@@ -24,7 +24,10 @@ function Root() {
       .finally(() => setChecking(false));
   }, []);
 
-  const isAdmin = window.location.pathname.startsWith("/admin");
+  // Vite's BASE_URL is /akshay-portfolio/ on GitHub Pages and / on a custom domain.
+  const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+  const pathname = window.location.pathname.replace(/\/$/, "");
+  const isAdmin = pathname === `${basePath}/admin` || pathname.startsWith(`${basePath}/admin/`);
 
   if (!isAdmin) return <App />;
   if (checking) return <div className="admin-auth-screen">Checking session...</div>;
