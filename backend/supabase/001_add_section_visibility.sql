@@ -13,3 +13,6 @@ ADD COLUMN IF NOT EXISTS section_visibility jsonb NOT NULL DEFAULT '{
 }'::jsonb;
 
 COMMENT ON COLUMN public.site_settings.section_visibility IS 'Controls which public portfolio sections are visible.';
+
+-- Refresh PostgREST's schema cache immediately after the column is added.
+NOTIFY pgrst, 'reload schema';
