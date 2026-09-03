@@ -1,9 +1,24 @@
 import { motion } from "framer-motion";
 
-function Hero({ profile }) {
+function Hero({ profile, visibility = {} }) {
   const data = profile;
 
   if (!data) return null;
+
+  const nextSection = [
+    { key: "about", id: "about" },
+    { key: "skills", id: "skills" },
+    { key: "experience", id: "experience" },
+    { key: "education", id: "education" },
+    { key: "projects", id: "projects" },
+    { key: "contact", id: "contact" }
+  ].find((section) => visibility[section.key] !== false);
+
+  const workTarget = visibility.projects !== false
+    ? "#projects"
+    : nextSection
+      ? `#${nextSection.id}`
+      : "#";
 
   return (
     <section id="home" className="hero-section">
@@ -67,7 +82,9 @@ function Hero({ profile }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <a className="hero-primary-action" href="#projects">View my work <span aria-hidden="true">↗</span></a>
+          <a className="hero-primary-action" href={workTarget}>
+            {visibility.projects !== false ? "View my work" : "Explore"} <span aria-hidden="true">↗</span>
+          </a>
           {data.resume_url && <a className="hero-secondary-action" href={data.resume_url} target="_blank" rel="noopener noreferrer">Résumé</a>}
         </motion.div>
 
@@ -85,10 +102,12 @@ function Hero({ profile }) {
         )}
       </div>
 
-      <a className="hero-scroll-hint" href="#about" aria-label="Scroll to About section">
-        <span>Scroll to explore</span>
-        <span aria-hidden="true">↓</span>
-      </a>
+      {nextSection && (
+        <a className="hero-scroll-hint" href={`#${nextSection.id}`} aria-label={`Scroll to ${nextSection.id} section`}>
+          <span>Scroll to explore</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      )}
     </section>
   );
 }
