@@ -88,46 +88,20 @@ function Skills({ skills }) {
                 </div>
 
                 <div className="skills-grid">
-                  {categorySkills.map((skill, skillIndex) => {
-                    const proficiency =
-                      skill.proficiency !== null && skill.proficiency !== undefined
-                        ? Math.min(Math.max(Number(skill.proficiency) || 0, 0), 100)
-                        : null;
-
-                    return (
-                      <Reveal key={skill.id || `${category}-${skill.name || skillIndex}`} delay={skillIndex * 0.05}>
-                        <article className="skill-card">
-                          <div className="skill-card-top">
-                            <div className="skill-identity">
-                              <span className="skill-icon" aria-hidden="true">
-                                <Icon icon={getSkillIcon(skill.name)} width="22" height="22" />
-                              </span>
-                              <h4>{skill.name || "Unnamed skill"}</h4>
-                            </div>
-
-                            {proficiency !== null && (
-                              <span className="skill-percentage">{proficiency}%</span>
-                            )}
+                  {categorySkills.map((skill, skillIndex) => (
+                    <Reveal key={skill.id || `${category}-${skill.name || skillIndex}`} delay={skillIndex * 0.05}>
+                      <article className="skill-card">
+                        <div className="skill-card-top">
+                          <div className="skill-identity">
+                            <span className="skill-icon" aria-hidden="true">
+                              <Icon icon={getSkillIcon(skill.name)} width="22" height="22" />
+                            </span>
+                            <h4>{skill.name || "Unnamed skill"}</h4>
                           </div>
-
-                          {proficiency !== null && (
-                            <div className="skill-proficiency">
-                              <div
-                                className="proficiency-track"
-                                role="progressbar"
-                                aria-label={`${skill.name || "Skill"} proficiency`}
-                                aria-valuemin="0"
-                                aria-valuemax="100"
-                                aria-valuenow={proficiency}
-                              >
-                                <div className="proficiency-fill" style={{ width: `${proficiency}%` }} />
-                              </div>
-                            </div>
-                          )}
-                        </article>
-                      </Reveal>
-                    );
-                  })}
+                        </div>
+                      </article>
+                    </Reveal>
+                  ))}
                 </div>
               </div>
             </Reveal>
