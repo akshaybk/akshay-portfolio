@@ -9,6 +9,7 @@ const visibilitySections = [
   { key: "education", label: "Education", description: "Your academic background." },
   { key: "projects", label: "Projects", description: "Your selected projects and work." },
   { key: "contact", label: "Contact", description: "Your contact and social links section." },
+  { key: "footer", label: "Footer", description: "The closing footer at the bottom of your portfolio." },
 ];
 
 const defaults = visibilitySections.reduce((result, section) => {
