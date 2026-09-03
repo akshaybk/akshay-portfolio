@@ -1,139 +1,29 @@
-/* Project showcase: every card uses a fixed, uniform desktop height. */
+/* Project showcase: every card uses a fixed, uniform desktop/tablet height. */
 .projects-showcase-grid {
   align-items: stretch;
   grid-auto-rows: 380px;
 }
-
-.projects-showcase-grid > * {
-  display: flex;
-  min-width: 0;
-  height: 380px;
-  min-height: 0;
+.projects-showcase-grid > * { display:flex; min-width:0; height:380px; min-height:0; }
+.projects-showcase-card { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(260px,.95fr); width:100%; height:380px; min-height:0; box-sizing:border-box; overflow:hidden; }
+.projects-showcase-copy { display:flex; min-width:0; min-height:0; flex-direction:column; justify-content:flex-start; padding:28px; overflow:hidden; }
+.projects-showcase-copy .project-description { margin-top:12px; min-height:50px; overflow-wrap:anywhere; }
+.projects-showcase-copy .project-technologies { min-height:32px; max-height:72px; overflow:hidden; align-content:flex-start; }
+.projects-showcase-links { margin-top:auto; padding-top:20px; flex-shrink:0; }
+.projects-showcase-media { position:relative; min-width:0; min-height:0; height:calc(100% - 36px); margin:18px 18px 18px 0; overflow:hidden; border:1px solid var(--border); border-radius:12px; background:radial-gradient(circle at 35% 20%,var(--accent-soft),transparent 58%),var(--bg-soft); }
+.projects-showcase-media .project-image { width:100%; height:100%; min-height:0; object-fit:cover; }
+.project-media-placeholder { display:flex; width:100%; height:100%; min-height:0; flex-direction:column; align-items:center; justify-content:center; gap:18px; color:var(--text-muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase; text-align:center; }
+.project-media-placeholder-mark { color:var(--accent-color); font-size:42px; font-weight:500; letter-spacing:-.08em; line-height:1; }
+@media(max-width:900px){
+  .projects-showcase-grid{grid-auto-rows:400px}
+  .projects-showcase-grid>*{height:400px}
+  .projects-showcase-card{grid-template-columns:minmax(0,1fr) minmax(220px,.85fr);height:400px}
+  .projects-showcase-copy{padding:24px}
 }
-
-.projects-showcase-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(260px, 0.95fr);
-  width: 100%;
-  height: 380px;
-  min-height: 0;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.projects-showcase-copy {
-  display: flex;
-  min-width: 0;
-  min-height: 0;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: 28px;
-  overflow: hidden;
-}
-
-.projects-showcase-copy .project-description {
-  margin-top: 12px;
-  min-height: 50px;
-}
-
-.projects-showcase-copy .project-technologies {
-  min-height: 32px;
-  max-height: 72px;
-  overflow: hidden;
-  align-content: flex-start;
-}
-
-.projects-showcase-links {
-  margin-top: auto;
-  padding-top: 20px;
-  flex-shrink: 0;
-}
-
-.projects-showcase-media {
-  position: relative;
-  min-width: 0;
-  min-height: 0;
-  height: calc(100% - 36px);
-  margin: 18px 18px 18px 0;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background:
-    radial-gradient(circle at 35% 20%, var(--accent-soft), transparent 58%),
-    var(--bg-soft);
-}
-
-.projects-showcase-media .project-image {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  object-fit: cover;
-}
-
-.project-media-placeholder {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  color: var(--text-muted);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.project-media-placeholder-mark {
-  color: var(--accent-color);
-  font-size: 42px;
-  font-weight: 500;
-  letter-spacing: -0.08em;
-  line-height: 1;
-}
-
-@media (max-width: 900px) {
-  .projects-showcase-grid {
-    grid-auto-rows: 400px;
-  }
-
-  .projects-showcase-grid > * {
-    height: 400px;
-  }
-
-  .projects-showcase-card {
-    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.85fr);
-    height: 400px;
-  }
-}
-
-@media (max-width: 700px) {
-  .projects-showcase-grid {
-    grid-auto-rows: auto;
-  }
-
-  .projects-showcase-grid > * {
-    height: auto;
-  }
-
-  .projects-showcase-card {
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: 0;
-  }
-
-  .projects-showcase-copy {
-    min-height: 290px;
-    overflow: visible;
-  }
-
-  .projects-showcase-media {
-    height: 230px;
-    margin: 0 18px 18px;
-  }
-
-  .project-media-placeholder {
-    min-height: 230px;
-  }
+@media(max-width:700px){
+  .projects-showcase-grid{grid-auto-rows:auto}
+  .projects-showcase-grid>*{height:auto}
+  .projects-showcase-card{grid-template-columns:1fr;height:auto;min-height:0}
+  .projects-showcase-copy{min-height:290px;overflow:visible;padding:22px}
+  .projects-showcase-media{height:230px;margin:0 18px 18px}
+  .project-media-placeholder{min-height:230px}
 }
