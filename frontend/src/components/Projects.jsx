@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Reveal from "./Reveal";
 
 function Projects({ projects }) {
@@ -34,6 +35,9 @@ function Projects({ projects }) {
 function ProjectCard({ project }) {
   const title = project.title || "Untitled Project";
   const technologies = Array.isArray(project.technologies) ? project.technologies : [];
+  const [imageFailed, setImageFailed] = useState(false);
+
+  const showImage = Boolean(project.image_url) && !imageFailed;
 
   return (
     <article className="project-card project-showcase-card">
@@ -71,22 +75,20 @@ function ProjectCard({ project }) {
         )}
       </div>
 
-      <div className="project-showcase-media" aria-hidden={project.image_url ? "false" : "true"}>
-        {project.image_url ? (
+      <div className="project-showcase-media" aria-label={showImage ? `${title} project preview` : `${title} project preview unavailable`}>
+        {showImage ? (
           <img
             src={project.image_url}
-            alt=""
+            alt={`${title} project preview`}
             className="project-image"
             loading="lazy"
-            onError={(event) => {
-              event.currentTarget.style.display = "none";
-              event.currentTarget.parentElement.classList.add("project-media-fallback");
-            }}
+            onError={() => setImageFailed(true)}
           />
         ) : (
-          <div className="project-media-placeholder">
+          <div className="project-media-placeholder" role="img" aria-label={`${title} project preview unavailable`}>
             <span>{title}</span>
-            <span className="project-media-placeholder-mark">&lt;/&gt;</span>
+            <span className="project-media-placeholder-mark" aria-hidden="true">&lt;/&gt;</span>
+            {project.image_url && <span>Preview unavailable</span>}
           </div>
         )}
       </div>
