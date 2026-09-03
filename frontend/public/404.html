@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio</title>
+    <script>
+      const path = window.location.pathname;
+      const base = "/akshay-portfolio/";
+      if (path.startsWith(base)) {
+        const route = path.slice(base.length);
+        sessionStorage.setItem("github-pages-route", route);
+      }
+      window.location.replace(base);
+    </script>
+  </head>
+  <body></body>
+</html>
