@@ -31,15 +31,33 @@ function Navbar({ profile }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [menuOpen]);
+
   const handleNavigation = () => setMenuOpen(false);
 
   return (
-    <nav className="navbar">
+    <nav className="navbar" aria-label="Primary navigation">
       <a href="#home" className="navbar-logo" onClick={handleNavigation}>{name}</a>
-      <button type="button" className={`navbar-menu-button ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen}>
+      <button
+        type="button"
+        className={`navbar-menu-button ${menuOpen ? "open" : ""}`}
+        onClick={() => setMenuOpen((open) => !open)}
+        aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+        aria-expanded={menuOpen}
+        aria-controls="primary-navigation"
+      >
         <span /><span /><span />
       </button>
-      <div className={`navbar-links ${menuOpen ? "open" : ""}`}>
+      <div id="primary-navigation" className={`navbar-links ${menuOpen ? "open" : ""}`}>
         {links.map((link) => (
           <a key={link.id} href={`#${link.id}`} className={activeSection === link.id ? "active" : ""} onClick={handleNavigation}>{link.label}</a>
         ))}
