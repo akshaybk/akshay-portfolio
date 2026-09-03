@@ -1,0 +1,16 @@
+/* Skills spacing polish */
+
+.skill-icon {
+  width: 44px;
+  height: 44px;
+  flex-basis: 44px;
+}
+
+.skill-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.skill-identity {
+  gap: 8px;
+}
