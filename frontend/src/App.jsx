@@ -77,8 +77,13 @@ function App() {
     document.documentElement.style.setProperty("--accent-border", hexToRgba(accentColor, 0.45));
   }, [portfolio.siteSettings]);
 
-  if (loading) return <div className="loading-screen">Loading...</div>;
-  if (error) return <div className="error-screen">{error}</div>;
+  useEffect(() => {
+    const title = portfolio.siteSettings?.site_title || portfolio.profile?.name || "Portfolio";
+    document.title = title;
+  }, [portfolio.siteSettings, portfolio.profile]);
+
+  if (loading) return <div className="loading-screen" role="status" aria-live="polite">Loading portfolio...</div>;
+  if (error) return <div className="error-screen" role="alert">{error}</div>;
 
   return (
     <>
