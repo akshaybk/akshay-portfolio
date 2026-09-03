@@ -24,6 +24,7 @@ import "./portfolio-polish.css";
 import "./projects-showcase.css";
 import "./projects-uniform.css";
 import "./contact-polish.css";
+import "./mobile-responsive.css";
 
 const firstRecord = (value) => (Array.isArray(value) ? value[0] || null : value || null);
 const records = (value) => (Array.isArray(value) ? value : value ? [value] : []);
