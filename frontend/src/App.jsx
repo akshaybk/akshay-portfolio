@@ -27,17 +27,10 @@ import "./contact-polish.css";
 
 const firstRecord = (value) => (Array.isArray(value) ? value[0] || null : value || null);
 const records = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+const defaultVisibility = { hero: true, about: true, skills: true, experience: true, education: true, projects: true, contact: true };
 
 function App() {
-  const [portfolio, setPortfolio] = useState({
-    profile: null,
-    projects: [],
-    skills: [],
-    experience: [],
-    education: [],
-    socialLinks: [],
-    siteSettings: null
-  });
+  const [portfolio, setPortfolio] = useState({ profile: null, projects: [], skills: [], experience: [], education: [], socialLinks: [], siteSettings: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -47,31 +40,16 @@ function App() {
         const [profile, projects, skills, experience, education, socialLinks, siteSettings] = await Promise.all([
           getProfile(), getProjects(), getSkills(), getExperience(), getEducation(), getSocialLinks(), getSiteSettings()
         ]);
-
-        setPortfolio({
-          profile: firstRecord(profile),
-          projects: records(projects),
-          skills: records(skills),
-          experience: records(experience),
-          education: records(education),
-          socialLinks: records(socialLinks),
-          siteSettings: firstRecord(siteSettings)
-        });
-      } catch (err) {
-        console.error("Portfolio loading error:", err);
-        setError(err.message || "Failed to load portfolio.");
-      } finally {
-        setLoading(false);
-      }
+        setPortfolio({ profile: firstRecord(profile), projects: records(projects), skills: records(skills), experience: records(experience), education: records(education), socialLinks: records(socialLinks), siteSettings: firstRecord(siteSettings) });
+      } catch (err) { console.error("Portfolio loading error:", err); setError(err.message || "Failed to load portfolio."); }
+      finally { setLoading(false); }
     };
-
     loadPortfolio();
   }, []);
 
   useEffect(() => {
     const accentColor = portfolio.siteSettings?.accent_color;
     if (!accentColor) return;
-
     document.documentElement.style.setProperty("--accent-color", accentColor);
     document.documentElement.style.setProperty("--accent-soft", hexToRgba(accentColor, 0.12));
     document.documentElement.style.setProperty("--accent-border", hexToRgba(accentColor, 0.45));
@@ -85,17 +63,19 @@ function App() {
   if (loading) return <div className="loading-screen" role="status" aria-live="polite">Loading portfolio...</div>;
   if (error) return <div className="error-screen" role="alert">{error}</div>;
 
+  const visibility = { ...defaultVisibility, ...(portfolio.siteSettings?.section_visibility || {}) };
+
   return (
     <>
-      <Navbar profile={portfolio.profile} />
+      <Navbar profile={portfolio.profile} visibility={visibility} />
       <main>
-        <Hero profile={portfolio.profile} siteSettings={portfolio.siteSettings} />
-        <About profile={portfolio.profile} />
-        <Skills skills={portfolio.skills} />
-        <Experience experience={portfolio.experience} />
-        <Education education={portfolio.education} />
-        <Projects projects={portfolio.projects} />
-        <SocialLinks links={portfolio.socialLinks} />
+        {visibility.hero && <Hero profile={portfolio.profile} siteSettings={portfolio.siteSettings} />}
+        {visibility.about && <About profile={portfolio.profile} />}
+        {visibility.skills && <Skills skills={portfolio.skills} />}
+        {visibility.experience && <Experience experience={portfolio.experience} />}
+        {visibility.education && <Education education={portfolio.education} />}
+        {visibility.projects && <Projects projects={portfolio.projects} />}
+        {visibility.contact && <SocialLinks links={portfolio.socialLinks} />}
       </main>
       <Footer siteSettings={portfolio.siteSettings} />
     </>
