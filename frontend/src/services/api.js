@@ -5,6 +5,31 @@ const API_BASE_URL = (
     : "https://akshay-portfolio-api.onrender.com/api")
 ).replace(/\/$/, "");
 
+let authRecoveryInProgress = false;
+
+const isAuthenticationError = (response, result) => {
+  if (response.status === 401 || response.status === 403) return true;
+
+  const message = String(result?.message || result?.error || "").toLowerCase();
+  return (
+    message.includes("jwt") &&
+    (message.includes("expired") ||
+      message.includes("invalid") ||
+      message.includes("malformed") ||
+      message.includes("signature"))
+  );
+};
+
+const recoverFromExpiredSession = () => {
+  if (authRecoveryInProgress || typeof window === "undefined") return;
+
+  authRecoveryInProgress = true;
+  localStorage.removeItem("portfolio_admin_token");
+
+  // Reload the current route instead of exposing the JWT/authentication error.
+  window.location.reload();
+};
+
 const request = async (endpoint, options = {}) => {
   let response;
   try {
@@ -22,6 +47,11 @@ const request = async (endpoint, options = {}) => {
   const result = await response.json().catch(() => ({}));
 
   if (!response.ok || !result.success) {
+    if (isAuthenticationError(response, result)) {
+      recoverFromExpiredSession();
+      return new Promise(() => {});
+    }
+
     const detail = result.error ? `: ${result.error}` : "";
     throw new Error(result.message ? `${result.message}${detail}` : `Request failed (${response.status})`);
   }
